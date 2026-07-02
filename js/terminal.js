@@ -369,6 +369,10 @@ const Terminal = (() => {
       inputResolver = resolve;
       inputReject = reject;
       render();
+      if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) {
+        const panel = document.getElementById('mobile-keyboard');
+        if (panel) panel.classList.add('visible');
+      }
     });
   }
 
@@ -384,7 +388,18 @@ const Terminal = (() => {
     inputResolver = null;
     inputReject = null;
     render();
+    const panel = document.getElementById('mobile-keyboard');
+    if (panel) panel.classList.remove('visible');
     if (resolve) resolve(typed);
+  }
+
+  function insertText(text) {
+    if (!liveLine) return;
+    const l = liveLine;
+    l.typed = l.typed.slice(0, l.cursor) + text + l.typed.slice(l.cursor);
+    l.cursor += text.length;
+    TermAudio.key();
+    render();
   }
 
   function handleShellKey(e) {
@@ -488,10 +503,7 @@ const Terminal = (() => {
 
     if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
       e.preventDefault();
-      l.typed = l.typed.slice(0, l.cursor) + e.key + l.typed.slice(l.cursor);
-      l.cursor++;
-      TermAudio.key();
-      render();
+      insertText(e.key);
     }
   }
 
@@ -732,6 +744,54 @@ const Terminal = (() => {
   });
 
   window.addEventListener("resize", resize);
+
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest('#mobile-keyboard button');
+    if (!button) return;
+    const key = button.getAttribute('data-key');
+    if (!key) return;
+    event.preventDefault();
+    if (key === 'Backspace') {
+      if (liveLine) {
+        if (liveLine.cursor > 0) {
+          liveLine.typed = liveLine.typed.slice(0, liveLine.cursor - 1) + liveLine.typed.slice(liveLine.cursor);
+          liveLine.cursor--;
+          TermAudio.tick();
+          render();
+        }
+      }
+      return;
+    }
+    if (key === 'Enter') {
+      if (liveLine) {
+        TermAudio.enter();
+        finalizeLine();
+      }
+      return;
+    }
+    if (key === 'Tab') {
+      if (liveLine && tabHandler) {
+        const completed = tabHandler(liveLine.typed);
+        if (typeof completed === 'string') {
+          liveLine.typed = completed;
+          liveLine.cursor = liveLine.typed.length;
+          render();
+        }
+      }
+      return;
+    }
+    if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
+      if (!liveLine) return;
+      const eventKey = { key };
+      handleShellKey(eventKey);
+      return;
+    }
+    if (key === 'Space') {
+      insertText(' ');
+      return;
+    }
+    insertText(key);
+  });
 
   async function loadFonts() {
     // Force the exact family/weight/size combo we render with to load
