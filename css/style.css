@@ -1,16 +1,10 @@
-/* ================================================================
-   BASE / RESET
-   The entire viewport is the monitor. No borders, no containers,
-   no chrome. Just the display.
-================================================================ */
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   -webkit-user-select: none;
   -moz-user-select: none;
-  user-select: none;            /* selection disabled, per spec */
+  user-select: none;           
 }
 
 html, body {
@@ -30,9 +24,6 @@ html, body {
   overflow: hidden;
 }
 
-/* text-canvas is never seen directly - it is only a texture source
-   for the WebGL CRT compositor. It must still be laid out at full
-   resolution so its internal drawing buffer matches the screen. */
 #text-canvas {
   position: absolute;
   inset: 0;
