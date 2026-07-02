@@ -2,7 +2,7 @@
 
 const Shell = (() => {
   const config = window.PORTFOLIO_CONFIG || {};
-  const defaultHome = config.homeDirName || "viewer";
+  const defaultHome = config.homeDirName || "panshi";
   let cwd = ["home", defaultHome];
   const cmdHistory = [];
 
@@ -16,7 +16,7 @@ const Shell = (() => {
 
     return {
       username: requestedUser || config.ownerName || "viewer",
-      hostname: requestedHost || config.hostname || window.location?.hostname || "port",
+      hostname: requestedHost || config.hostname || window.location?.hostname || "portfolio",
     };
   }
 
@@ -97,7 +97,7 @@ const Shell = (() => {
         const type = child.type === "dir" ? "d" : "-";
         const perms = child.type === "dir" ? "rwxr-xr-x" : "rw-r--r--";
         const size = child.type === "file" ? String((child.content || "").length).padStart(5, " ") : "  4096";
-        Terminal.print(`${type}${perms} 1 ${currentUsername} ${currentUsername} ${size} Jan 1 00:00 ${n}${child.type === "dir" ? "/" : ""}`);
+        Terminal.print(`${type}${perms} 1 panshi panshi ${size} Jan 1 00:00 ${n}${child.type === "dir" ? "/" : ""}`);
       }
     } else {
       Terminal.print(names.map(n => node.children[n].type === "dir" ? n + "/" : n).join("   "));
@@ -177,7 +177,7 @@ const Shell = (() => {
 
   function cmd_uname(args) {
     if (args.includes("-a")) {
-      Terminal.print(`Linux ${currentHostname} 6.2.0-${currentUsername} #1 SMP PREEMPT x86_64 GNU/Linux`);
+      Terminal.print("Linux portfolio 6.2.0-panshi #1 SMP PREEMPT x86_64 GNU/Linux");
     } else {
       Terminal.print("Linux");
     }
@@ -236,7 +236,7 @@ const Shell = (() => {
   }
 
   function cmd_sudo(args) {
-    Terminal.print(`${currentUsername} is not in the sudoers file. This incident will be reported.`);
+    Terminal.print("panshi is not in the sudoers file. This incident will be reported.");
   }
 
  //colors of terminal
@@ -334,13 +334,12 @@ const Shell = (() => {
 
   async function cmd_matrix() {
     await Terminal.runMatrix();
-    Terminal.print(`Wake up, ${currentUsername}...`);
+    Terminal.print("Wake up, panshi...");
   }
 
   async function cmd_tictactoe() {
-    Terminal.print("Entering tic-tac-toe... press 1-9 to play, q to quit.");
     const result = await Terminal.runTicTacToe();
-    Terminal.print(result || "Thanks for playing tic-tac-toe.");
+    Terminal.print(result);
   }
 //reboot
   async function cmd_reboot() {
@@ -359,21 +358,21 @@ const Shell = (() => {
   const BOOT_TIME = Date.now();
 
   const ASCII_LOGO = [
-    "⢀⠇⠀⠉⠙⠕⡆⠀⢀⠠⠀⠂⠀⠁⠈⠀⠁⠀⠂⠠⠀⡀⠀⠀⣀⡠⠰⠐⠘⢩",
-"⢸⡆⠀⠀⠀⠀⢼⠂⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢾⠀⠀⠀⠀⢠",
-"⠸⣇⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⡆⠀⠀⠀⢸",
-"⠰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠴⣶⣶⣤⠀⠀⠀⠀⠀⠀⠀⠀⠤⠒⠚",
-"⠀⠌⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⢀⣿⡟⠉⡇⠀⠀⠀⠀⠀⠀⠀⠀⢄⠀",
-"⠀⡃⠀⠀⠀⣠⣶⡮⠻⣿⣿⣦⡀⠀⣸⢿⢿⡧⠞⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠀",
-"⠁⠄⠀⢠⣾⣿⠇⠀⠀⠈⠻⣿⣿⣆⠁⠋⠘⠀⠀⢀⣀⣀⡀⠀⠀⠀⠀⠀⢰⠀",
-"⠈⠰⡀⣿⣿⢿⠀⠀⠀⠀⣰⣿⣿⣿⣷⣶⣶⣿⣿⣿⠿⠿⠛⢀⠀⠀⠀⠀⠨⠀",
-"⠀⠀⠀⣋⣭⣤⠳⡀⢀⣴⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀⠀⠀⠸⣿⡆⠀⠀⠀⠐⠀",
-"⠀⢠⣾⣿⣿⣧⡔⣾⣿⣿⣿⣿⣿⣐⣊⣿⣿⣿⡀⠀⠀⠀⣼⒈ ⢸⠀⠀⠀⠠⠀",
-"⠀⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀   ⣿⣿⣿⣷⣤⣤⣾⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀",
-"⠀⠙⠿⠟⠛⠁⠈⠻⠿⡿        ⣿⣿⣿⣿⣿⣿⣿⡟",
-"⠀⢠⣴⣦⣤⣶⣴⠁⠄⡘⠀⠀⢀⡾⣿⣿⣿⠿⠿⠟⣍⡀⡀⠄⠂⠀⠀⠀",
-"⢠⢈⡻⡇⡸⣇⣿⢿⢶⣶⣴⡻⠃⠀⢠⠀" ,
-"⠀⠘⠈⠁⠀⠀⠉⣘⡚⠸⠟⢿⠄⠀⠠⠟ ",
+
+    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣤⣄⠀⠀⢀⣀⣀⡀⠀⠀⠀⠀",
+"⠀⠀⠀⢠⡾⠛⠳⠶⣤⣀⣠⣤⣤⣴⡟⠁⠀⠙⣷⠟⠋⠉⠉⢿⡀⠀⠀⠀",
+"⠀⠀⠀⣾⠁⠀⠀⠀⠀⠉⠀⠀⠀⡿⠀⢠⣟⣿⠿⠳⢦⣤⡴⣼⣇⠀⠀⠀",
+"⠀⠀⠀⢻⣤⠀⠀⠀⠀⠀⠀⠀⠀⢿⣄⣀⣽⣏⠀⠀⢸⣷⡄⠀⣿⠀⠀⠀",
+"⠀⠀⠀⣼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠀⠉⠓⢾⡟⠛⢁⣼⣟⠀⠀⠀",
+"⠀⢀⣼⣇⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣙⣿⣿⣥⣽⢤⠀⠀",
+"⣀⣈⣷⣏⣁⠀⠀⢀⠀⠉⠙⠻⣶⣾⣳⣶⠟⠉⠁⢀⠀⠀⠀⠶⢻⡟⠒⠒",
+"⠀⠀⠸⣇⣀⠀⠀⠛⠉⠂⠀⢀⡿⣉⣉⢿⡄⠀⠒⠉⠋⠀⠀⠠⣼⠧⢤⠀",
+"⠀⠐⠛⠻⣍⣀⡀⠀⠀⢀⣠⠞⠙⠧⠼⠈⠳⣄⡀⠀⠀⠀⣠⣴⣟⡀⠀⠀",
+"⠀⠀⣠⠴⠛⢿⣭⠿⠿⢯⡅⠀⠀⠀⠀⠀⠀⣠⣭⣩⣭⣭⣿⣋⠈⠙⠂⠀",
+"⠀⠀⠀⠀⢠⡟⠁⠀⠀⠀⣿⠶⠶⠶⠤⠶⣾⠇⠀⠘⣧⠀⠀⢹⡇⠀⠀⠀",
+"⠀⠀⠀⠀⠸⣇⠀⠀⣰⠾⠋⠀⠀⠀⠀⠀⣧⡀⠀⠀⢿⣄⣤⡾⠁⠀⠀⠀",
+"⠀⠀⠀⠀⠀⠈⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⠈⠛⠒⠒⠚⠋⠁⠀⠀⠀⠀⠀",
+"⋆｡‧˚ʚ🍓ɞ˚‧｡⋆",
 
   ];
 
