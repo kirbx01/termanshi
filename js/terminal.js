@@ -1,6 +1,6 @@
 /* ================================================================
    TERMINAL.JS
-   Renders EVERY character of this fake OS onto a 2D <canvas> -
+   Renders EVERY character of this pseudo OS onto a 2D <canvas> -
    there is no DOM text anywhere. Owns the scrollback buffer, the
    blinking block cursor, keyboard input (with history + tab
    completion), and a minimal full-screen nano editor mode.

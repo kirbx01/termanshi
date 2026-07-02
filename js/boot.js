@@ -46,8 +46,7 @@ async function runShellLoop() {
 async function main() {
   await Terminal.init();
   await runBootSequence();
-  // login -> shell -> (on "exit") back to a fresh login screen, forever -
-  // exactly like a real multi-user Linux box, no full reboot needed.
+  // login -> shell -> (on "exit") back to a fresh login screen, forever.
   while (true) {
     await runLogin();
     Terminal.print("Connected to network.");
