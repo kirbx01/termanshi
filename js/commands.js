@@ -1,7 +1,9 @@
 //commands of this file globally
 
 const Shell = (() => {
-  let cwd = ["home", "panshi"];
+  const config = window.PORTFOLIO_CONFIG || {};
+  const defaultHome = config.homeDirName || "panshi";
+  let cwd = ["home", defaultHome];
   const cmdHistory = [];
 
   function getViewerIdentity() {
@@ -13,8 +15,8 @@ const Shell = (() => {
     const requestedHost = params.get("host") || params.get("hostname");
 
     return {
-      username: requestedUser || "viewer",
-      hostname: requestedHost || window.location?.hostname || "portfolio",
+      username: requestedUser || config.ownerName || "viewer",
+      hostname: requestedHost || config.hostname || window.location?.hostname || "portfolio",
     };
   }
 
@@ -73,7 +75,7 @@ const Shell = (() => {
   function cmd_pwd() { Terminal.print(fsPathString(cwd)); }
 
   function cmd_cd(args) {
-    const target = args[0] || "/home/panshi";
+    const target = args[0] || `/home/${defaultHome}`;
     const { parts, node } = resolveNode(target);
     if (!node) { Terminal.print(`cd: ${target}: No such file or directory`); return; }
     if (node.type !== "dir") { Terminal.print(`cd: ${target}: Not a directory`); return; }
@@ -423,9 +425,9 @@ const Shell = (() => {
       } catch (e) { /* leave as unavailable */ }
     }
 
-    const projects = countChildren(["home", "panshi", "projects"]);
-    const socials = countChildren(["home", "panshi", "socials"]);
-    const graphics = countChildren(["home", "panshi", "graphics"]);
+    const projects = countChildren(["home", defaultHome, "projects"]);
+    const socials = countChildren(["home", defaultHome, "socials"]);
+    const graphics = countChildren(["home", defaultHome, "graphics"]);
 
   // dot has independent colours
     // whichever terminal theme is currently active
