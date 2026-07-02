@@ -3,8 +3,24 @@
 const Shell = (() => {
   let cwd = ["home", "panshi"];
   const cmdHistory = [];
-  let currentUsername = "panshi";
-  let currentHostname = "portfolio";
+
+  function getViewerIdentity() {
+    const params = typeof window !== "undefined" && window.location
+      ? new URLSearchParams(window.location.search)
+      : new URLSearchParams();
+
+    const requestedUser = params.get("user") || params.get("username") || params.get("who");
+    const requestedHost = params.get("host") || params.get("hostname");
+
+    return {
+      username: requestedUser || "viewer",
+      hostname: requestedHost || window.location?.hostname || "portfolio",
+    };
+  }
+
+  const { username: initialUsername, hostname: initialHostname } = getViewerIdentity();
+  let currentUsername = initialUsername;
+  let currentHostname = initialHostname;
   const HELP_TEXT =
 `Available commands:
 
@@ -35,7 +51,7 @@ const Shell = (() => {
   setfont [opt]      resize/switch font (try 'setfont' for usage)
   volume [level]    adjust global audio volume (0.0-1.0)
   matrix            enter the matrix
-  snake             play a quick game of snake`;
+  tictactoe         play tic-tac-toe`;
 
   function splitArgs(raw) {
     return raw.trim().split(/\s+/).filter(Boolean);
@@ -319,9 +335,9 @@ const Shell = (() => {
     Terminal.print("Wake up, panshi...");
   }
 
-  async function cmd_snake() {
-    const score = await Terminal.runSnake();
-    Terminal.print(`Final score: ${score}`);
+  async function cmd_tictactoe() {
+    const result = await Terminal.runTicTacToe();
+    Terminal.print(result);
   }
 //reboot
   async function cmd_reboot() {
@@ -513,7 +529,7 @@ const Shell = (() => {
       case "setfont": return cmd_setfont(args);
       case "volume": return cmd_volume(args);
       case "matrix": return await cmd_matrix();
-      case "snake": return await cmd_snake();
+      case "tictactoe": return await cmd_tictactoe();
       default:
         Terminal.print(`${cmd}: command not found`);
     }

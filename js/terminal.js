@@ -560,7 +560,7 @@ const Terminal = (() => {
   }
 
   // ---------------------------------------------------------------
-  // fun commands: matrix rain + snake game
+  // fun commands: matrix rain + tic-tac-toe
   // both take over the canvas directly (like nano mode) and hand
   // control back to the shell once the visitor exits.
   // ---------------------------------------------------------------
@@ -619,26 +619,22 @@ const Terminal = (() => {
     });
   }
 
-  function runSnake() {
+  function runTicTacToe() {
     return new Promise((resolve) => {
       mode = "game";
-      const boardW = Math.max(16, Math.min(34, cols - 6));
-      const boardH = Math.max(10, Math.min(16, rows - 8));
-      let snake = [{ x: Math.floor(boardW / 2), y: Math.floor(boardH / 2) }];
-      let dir = { x: 1, y: 0 };
-      let nextDir = dir;
-      let score = 0;
+      const board = Array(9).fill(null);
+      let currentPlayer = "X";
+      let winner = null;
       let over = false;
-      let tickTimer = null;
 
-      function spawnFood() {
-        let f;
-        do {
-          f = { x: Math.floor(Math.random() * boardW), y: Math.floor(Math.random() * boardH) };
-        } while (snake.some(s => s.x === f.x && s.y === f.y));
-        return f;
+      function checkWinner(cells) {
+        const wins = [
+          [0, 1, 2], [3, 4, 5], [6, 7, 8],
+          [0, 3, 6], [1, 4, 7], [2, 5, 8],
+          [0, 4, 8], [2, 4, 6],
+        ];
+        return wins.find(combo => combo.every(i => cells[i] && cells[i] === cells[combo[0]]))?.map(i => cells[i])[0] || null;
       }
-      let food = spawnFood();
 
       function renderFrame() {
         ctx.save();
@@ -648,69 +644,60 @@ const Terminal = (() => {
         ctx.restore();
         applyFont();
 
-        drawTextRow(` SNAKE   score: ${score}   arrows / wasd to move, q to quit`, 0);
-        const border = "+" + "-".repeat(boardW) + "+";
-        drawTextRow(border, 1);
-        for (let y = 0; y < boardH; y++) {
-          let row = "|";
-          for (let x = 0; x < boardW; x++) {
-            const isHead = snake[0].x === x && snake[0].y === y;
-            const isBody = !isHead && snake.some(s => s.x === x && s.y === y);
-            const isFood = food.x === x && food.y === y;
-            row += isHead ? "@" : isBody ? "o" : isFood ? "*" : " ";
-          }
-          row += "|";
-          drawTextRow(row, 2 + y);
+        drawTextRow(" TIC TAC TOE   1-9 to play, q to quit", 0);
+        drawTextRow("+---+---+---+", 2);
+        for (let row = 0; row < 3; row++) {
+          const cells = board.slice(row * 3, row * 3 + 3);
+          const line = `| ${cells.map(cell => cell || " ").join(" | ")} |`;
+          drawTextRow(line, 3 + row * 2);
+          if (row < 2) drawTextRow("+---+---+---+", 4 + row * 2);
         }
-        drawTextRow(border, 2 + boardH);
-        if (over) {
-          drawTextRow(`  GAME OVER - score: ${score} - press any key to exit`, 3 + boardH);
-        }
+        drawTextRow("+---+---+---+", 8);
+
+        let status = over
+          ? winner
+            ? `Winner: ${winner} — press any key to exit`
+            : "Tie! — press any key to exit"
+          : `Turn: ${currentPlayer} — pick a square`;
+        drawTextRow(status, 10);
       }
 
-      function tick() {
-        if (over) return;
-        dir = nextDir;
-        const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
-        const hitWall = head.x < 0 || head.x >= boardW || head.y < 0 || head.y >= boardH;
-        const hitSelf = snake.some(s => s.x === head.x && s.y === head.y);
-        if (hitWall || hitSelf) {
-          over = true;
-          clearInterval(tickTimer);
-          renderFrame();
-          return;
-        }
-        snake.unshift(head);
-        if (head.x === food.x && head.y === food.y) {
-          score += 10;
-          food = spawnFood();
-        } else {
-          snake.pop();
-        }
-        renderFrame();
-      }
-
-      function cleanup() {
-        clearInterval(tickTimer);
+      function cleanup(exitMessage) {
         activeGame = null;
         mode = "shell";
         render();
+        resolve(exitMessage);
       }
 
       activeGame = {
         onKey(e) {
           const k = e.key.toLowerCase();
-          if (over) { e.preventDefault(); cleanup(); resolve(score); return; }
-          if (k === "q") { e.preventDefault(); over = true; clearInterval(tickTimer); renderFrame(); return; }
-          if ((k === "arrowup" || k === "w") && dir.y === 0) { e.preventDefault(); nextDir = { x: 0, y: -1 }; }
-          else if ((k === "arrowdown" || k === "s") && dir.y === 0) { e.preventDefault(); nextDir = { x: 0, y: 1 }; }
-          else if ((k === "arrowleft" || k === "a") && dir.x === 0) { e.preventDefault(); nextDir = { x: -1, y: 0 }; }
-          else if ((k === "arrowright" || k === "d") && dir.x === 0) { e.preventDefault(); nextDir = { x: 1, y: 0 }; }
+          if (over) { e.preventDefault(); cleanup("Thanks for playing tic-tac-toe."); return; }
+          if (k === "q") { e.preventDefault(); cleanup("You quit tic-tac-toe."); return; }
+
+          const index = Number.parseInt(k, 10) - 1;
+          if (!Number.isInteger(index) || index < 0 || index > 8) return;
+
+          if (board[index] !== null) return;
+          e.preventDefault();
+          board[index] = currentPlayer;
+          winner = checkWinner(board);
+          if (winner) {
+            over = true;
+            renderFrame();
+            return;
+          }
+          if (board.every(Boolean)) {
+            over = true;
+            renderFrame();
+            return;
+          }
+          currentPlayer = currentPlayer === "X" ? "O" : "X";
+          renderFrame();
         },
       };
 
       renderFrame();
-      tickTimer = setInterval(tick, 140);
     });
   }
 
@@ -762,7 +749,7 @@ const Terminal = (() => {
     setTheme, getTheme, THEME_NAMES, DOT_HUES,
     setFontSize, adjustFontSize, setFontFamily, resetFont, getFontInfo,
     FONT_FAMILIES,
-    runMatrix, runSnake,
+    runMatrix, runTicTacToe,
     get cols() { return cols; },
     get rows() { return rows; },
   };
