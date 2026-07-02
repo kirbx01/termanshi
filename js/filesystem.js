@@ -1,5 +1,7 @@
 /*filesystem and the root*/
 
+const HOME_NAME = (window.PORTFOLIO_CONFIG && window.PORTFOLIO_CONFIG.homeDirName) || "panshi";
+
 function dir(children) {
   return { type: "dir", children };
 }
@@ -9,7 +11,7 @@ function file(content, url) {
 
 const FS_ROOT = dir({
   home: dir({
-    panshi: dir({
+    [HOME_NAME]: dir({
       "Resume.pdf": file("Binary file - use `curl Resume.pdf` to download.", null),
 
       //about
@@ -116,7 +118,8 @@ function fsPathString(parts) {
 function fsDisplayPath(parts) {
   //real linux imitation sort of thing here since ~ is officially (in arch,fedora)
   const full = fsPathString(parts);
-  if (full === "/home/panshi") return "~";
-  if (full.startsWith("/home/panshi/")) return "~" + full.slice("/home/panshi".length);
+  const homePath = `/home/${HOME_NAME}`;
+  if (full === homePath) return "~";
+  if (full.startsWith(homePath + "/")) return "~" + full.slice(homePath.length);
   return full;
 }

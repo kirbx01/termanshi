@@ -1,7 +1,7 @@
 window.PORTFOLIO_CONFIG = {
-  ownerName: "panshi",
-  hostname: "portfolio",
-  welcomeMessage: "Welcome back, panshi.",
+  ownerName: "viewer",
+  hostname: "port",
+  welcomeMessage: "Welcome back, viewer.",
   siteTitle: "☆*: .｡. o(≧▽≦)o .｡.:*☆",
-  homeDirName: "panshi",
+  homeDirName: "viewer",
 };

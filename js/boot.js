@@ -26,7 +26,7 @@ async function runLogin() {
   Terminal.print("Access granted.");
   await Terminal.sleep(350);
   const config = window.PORTFOLIO_CONFIG || {};
-  Terminal.print(config.welcomeMessage || "Welcome back, panshi.");
+  Terminal.print(config.welcomeMessage || "Welcome back, viewer.");
   await Terminal.sleep(600);
   Terminal.clear();
 }

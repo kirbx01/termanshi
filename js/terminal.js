@@ -621,6 +621,7 @@ const Terminal = (() => {
 
   function runTicTacToe() {
     return new Promise((resolve) => {
+      activeGame = null;
       mode = "game";
       const board = Array(9).fill(null);
       let currentPlayer = "X";
