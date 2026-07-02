@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>☆*: .｡. o(≧▽≦)o .｡.:*☆</title>
+<title>Portfolio</title>
 <script src="js/config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=IBM+Plex+Mono:wght@700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
@@ -12,12 +12,12 @@
 </head>
 <body>
 
-  <!-- The whole viewport is the monitor. No chrome, no borders, no containers. -->
+  <!-- The whole viewport is the monitor. -->
   <div id="screen">
 
     <!-- text-canvas: 2D canvas where every character of the OS is drawn.
-         It is never shown directly - it is opacity:0 and only exists as a
-         WebGL texture source for the CRT compositor below. -->
+         Not to be shown directly and only exists as a
+         WebGL texture source for the CRT compositor below. (info for cloners) -->
     <canvas id="text-canvas"></canvas>
 
     <!-- crt-canvas: WebGL canvas that samples text-canvas as a texture and

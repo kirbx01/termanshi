@@ -628,6 +628,8 @@ const Terminal = (() => {
       let winner = null;
       let over = false;
       let settled = false;
+      let raf = null;
+      let alive = true;
 
       function checkWinner(cells) {
         const wins = [
@@ -667,24 +669,33 @@ const Terminal = (() => {
       function cleanup(exitMessage) {
         if (settled) return;
         settled = true;
+        alive = false;
+        if (raf) cancelAnimationFrame(raf);
         activeGame = null;
         mode = "shell";
         render();
         resolve(exitMessage);
       }
 
+      function frame() {
+        if (!alive) return;
+        renderFrame();
+        raf = requestAnimationFrame(frame);
+      }
+
       activeGame = {
         onKey(e) {
           const k = e.key.toLowerCase();
           if (settled) return;
-          if (over) { e.preventDefault(); cleanup("Thanks for playing tic-tac-toe."); return; }
-          if (k === "q") { e.preventDefault(); cleanup("You quit tic-tac-toe."); return; }
+          if (over) { e.preventDefault(); e.stopPropagation(); cleanup("Thanks for playing tic-tac-toe."); return; }
+          if (k === "q") { e.preventDefault(); e.stopPropagation(); cleanup("You quit tic-tac-toe."); return; }
 
           const index = Number.parseInt(k, 10) - 1;
           if (!Number.isInteger(index) || index < 0 || index > 8) return;
 
           if (board[index] !== null) return;
           e.preventDefault();
+          e.stopPropagation();
           board[index] = currentPlayer;
           winner = checkWinner(board);
           if (winner) {
@@ -702,7 +713,7 @@ const Terminal = (() => {
         },
       };
 
-      renderFrame();
+      frame();
     });
   }
 
