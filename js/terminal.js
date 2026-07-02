@@ -627,6 +627,7 @@ const Terminal = (() => {
       let currentPlayer = "X";
       let winner = null;
       let over = false;
+      let settled = false;
 
       function checkWinner(cells) {
         const wins = [
@@ -664,6 +665,8 @@ const Terminal = (() => {
       }
 
       function cleanup(exitMessage) {
+        if (settled) return;
+        settled = true;
         activeGame = null;
         mode = "shell";
         render();
@@ -673,6 +676,7 @@ const Terminal = (() => {
       activeGame = {
         onKey(e) {
           const k = e.key.toLowerCase();
+          if (settled) return;
           if (over) { e.preventDefault(); cleanup("Thanks for playing tic-tac-toe."); return; }
           if (k === "q") { e.preventDefault(); cleanup("You quit tic-tac-toe."); return; }
 
