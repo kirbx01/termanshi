@@ -12,7 +12,7 @@ const TermAudio = (() => {
     if (level > 1) level = 1; //max volume is 1.0
     volumeMultiplier = level;
     if (humGain) { // Adjust hum if it's already playing
-      humGain.gain.value = 0.0035 * volumeMultiplier; // veryfaint
+      humGain.gain.value = 0.035 * volumeMultiplier;
     }
   }
 
@@ -38,7 +38,7 @@ const TermAudio = (() => {
     humGain = ctx.createGain();
     humOsc.type = "sine";
     humOsc.frequency.value = 60; // mains-hum-esque low frequency
-    humGain.gain.value = 0.0035 * volumeMultiplier; // very faint, adjusted by multiplier
+    humGain.gain.value = 0.035 * volumeMultiplier;
     humOsc.connect(humGain);
     humGain.connect(ctx.destination);
     humOsc.start();
@@ -52,7 +52,7 @@ const TermAudio = (() => {
     const gain = ctx.createGain();
     osc.type = "square";
     osc.frequency.setValueAtTime(1200 + Math.random() * 300, t);
-    gain.gain.setValueAtTime(0.015 * volumeMultiplier, t);
+    gain.gain.setValueAtTime(0.12 * volumeMultiplier, t);
     gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.035);
     osc.connect(gain);
     gain.connect(ctx.destination);
@@ -69,7 +69,7 @@ const TermAudio = (() => {
     osc.type = "square";
     osc.frequency.setValueAtTime(500, t);
     osc.frequency.exponentialRampToValueAtTime(300, t + 0.07);
-    gain.gain.setValueAtTime(0.02 * volumeMultiplier, t);
+    gain.gain.setValueAtTime(0.16 * volumeMultiplier, t);
     gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
     osc.connect(gain);
     gain.connect(ctx.destination);
@@ -85,7 +85,7 @@ const TermAudio = (() => {
     const gain = ctx.createGain();
     osc.type = "triangle";
     osc.frequency.setValueAtTime(220, t);
-    gain.gain.setValueAtTime(0.012 * volumeMultiplier, t);
+    gain.gain.setValueAtTime(0.1 * volumeMultiplier, t);
     gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
     osc.connect(gain);
     gain.connect(ctx.destination);
