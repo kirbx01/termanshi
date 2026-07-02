@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>☆*: .｡. o(≧▽≦)o .｡.:*☆</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=IBM+Plex+Mono:wght@700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/crt.css">
+</head>
+<body>
+
+  <!-- The whole viewport is the monitor. No chrome, no borders, no containers. -->
+  <div id="screen">
+
+    <!-- text-canvas: 2D canvas where every character of the OS is drawn.
+         It is never shown directly - it is opacity:0 and only exists as a
+         WebGL texture source for the CRT compositor below. -->
+    <canvas id="text-canvas"></canvas>
+
+    <!-- crt-canvas: WebGL canvas that samples text-canvas as a texture and
+         applies barrel distortion, chromatic aberration, vignette, phosphor
+         mask/aperture grille, scanlines, flicker, noise, sync glitches and
+         raster drift. This is the only thing the visitor actually sees. -->
+    <canvas id="crt-canvas"></canvas>
+
+  </div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/filesystem.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/commands.js"></script>
+  <script src="js/boot.js"></script>
+</body>
+</html>

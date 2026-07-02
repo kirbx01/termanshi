@@ -1,0 +1,122 @@
+/*filesystem and the root*/
+
+function dir(children) {
+  return { type: "dir", children };
+}
+function file(content, url) {
+  return { type: "file", content: content || "", url: url || null };
+}
+
+const FS_ROOT = dir({
+  home: dir({
+    panshi: dir({
+      "Resume.pdf": file("Binary file - use `curl Resume.pdf` to download.", null),
+
+      //about
+
+      "about.txt": file(
+`Priyanshi, 19F, Delhi, India
+Exploring Low Level Systems, Embedded Firmware, and Real-time Graphics.
+I like to build things that are small, fast, and deterministic.
+I also like to make them look nice while doing it, but it never looks so, well....`),
+
+//skills
+      "skills.txt": file(
+`Languages:      C, C++, Rust, Python, JavaScript, PSQL
+Embedded:       ARM Cortex-M, AVR, RTOS, Bare-metal firmware
+Hardware:       PCB Design, KiCad, Signal Integrity, Debugging w/ scope+LA
+Graphics:       OpenGL, GLSL, Real-time rendering, Computational geometry
+Systems:        Linux, Bootloaders, Device Drivers, Memory-mapped I/O
+Tools:          Git, GDB, JTAG/SWD, Oscilloscope, Logic Analyzer`),
+//contact
+
+      "contact.txt": file(
+`Email:    priyanshiiroy@proton.me
+  GitHub:   github.com/kirbyandluigixxcf
+  LinkedIn: linkedin.com/in/priyanshiroy
+
+Feel free to reach out >///< `),
+
+//projects
+
+      projects: dir({
+        Neutron: file(
+`A lightweight embedded RTOS scheduler written in C for ARM Cortex-M
+targets. Focus on deterministic task switching and minimal footprint.
+
+curl Neutron  ->  opens the GitHub repository`,
+          "https://github.com/panshi/neutron"),
+
+
+        Discoring : file(
+`Discoring
+A Discord music bot written in Rust with native audio playback, avoiding FFmpeg entirely. Built as a learning project focused on performance, simplicity, and low dependencies. Still a work in progress.
+curl Discoring  ->  opens the GitHub repository`,
+          "https://github.com/kirbyandluigixxcf/discoring"),
+      }),
+//graphics
+      graphics: dir({
+        Artstation : file("Digital art & 3D work.\ncurl Artstation -> opens profile", "https://www.artstation.com/pansgotnocakes/"),
+        Behance: file("Graphic design & visual work.\ncurl Behance -> opens profile", "https://www.behance.net/priyanshi--")
+      }),
+//media (music,video streaming)
+      media: dir({
+        YouTube: file("Project walkthroughs & builds.\ncurl YouTube -> opens channel", "https://www.youtube.com/@panshi"),
+        Spotify: file("What I listen to while soldering.\ncurl Spotify -> opens profile", "https://open.spotify.com/user/615hglvwo1oe64zlk8matve1b?si=7284840f2b5c4fb5"),
+      }),
+//socials
+      socials: dir({
+        GitHub: file("Code & firmware repos.\ncurl GitHub -> opens profile", "https://github.com/kirbyandluigixxcf"),
+        LinkedIn: file("Professional profile.\ncurl LinkedIn -> opens profile", "https://www.linkedin.com/in/priyanshiroy/"),
+        Twitter: file("Short-form updates.\ncurl Twitter -> opens profile", "https://twitter.com/phiandrho"),
+      }),
+    }),
+  }),
+  etc: dir({}),
+  usr: dir({}),
+  var: dir({}),
+  opt: dir({}),
+  bin: dir({}),
+  dev: dir({}),
+  proc: dir({}),
+});
+
+//filesystem helpers
+function fsNormalize(path) {
+  // Resolve "." and ".." segments into a clean array of parts.
+  const parts = path.split("/").filter(Boolean);
+  const out = [];
+  for (const p of parts) {
+    if (p === ".") continue;
+    if (p === "..") out.pop();
+    else out.push(p);
+  }
+  return out;
+}
+
+function fsResolve(cwdParts, inputPath) {
+  if (!inputPath || inputPath === "") return cwdParts.slice();
+  if (inputPath.startsWith("/")) return fsNormalize(inputPath);
+  return fsNormalize(cwdParts.concat(inputPath.split("/")).join("/"));
+}
+
+function fsGetNode(parts) {
+  let node = FS_ROOT;
+  for (const p of parts) {
+    if (!node || node.type !== "dir" || !node.children[p]) return null;
+    node = node.children[p];
+  }
+  return node;
+}
+
+function fsPathString(parts) {
+  return "/" + parts.join("/");
+}
+
+function fsDisplayPath(parts) {
+  //real linux imitation sort of thing here since ~ is officially (in arch,fedora)
+  const full = fsPathString(parts);
+  if (full === "/home/panshi") return "~";
+  if (full.startsWith("/home/panshi/")) return "~" + full.slice("/home/panshi".length);
+  return full;
+}

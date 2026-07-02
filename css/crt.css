@@ -1,0 +1,30 @@
+/* ================================================================
+   CRT SUPPORT STYLES
+   The real barrel distortion, chromatic aberration, phosphor mask,
+   vignette, noise, flicker and glitch all happen per-pixel inside
+   the WebGL fragment shader in js/effects.js. This file only holds
+   the small amount of CSS needed to keep the canvas crisp and to
+   suppress any browser chrome that would break the illusion.
+================================================================ */
+
+html, body {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+canvas {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+  display: block;
+}
+
+/* Prevent any focus outline / tap highlight from breaking immersion */
+* {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
