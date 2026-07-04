@@ -19,7 +19,7 @@ async function runBootSequence() {
 
 async function runLogin() {
   Terminal.print("");
-  await Terminal.readLine({ prefix: "login: " }); //liveechoing
+  await Terminal.readLine({ prefix: "login: " });
   await Terminal.readLine({ prefix: "Password: ", mask: "-" });
   Terminal.print("Authenticating...");
   await Terminal.sleep(650);
@@ -29,6 +29,9 @@ async function runLogin() {
   Terminal.print(config.welcomeMessage || "Welcome back, viewer.");
   await Terminal.sleep(600);
   Terminal.clear();
+  Terminal.print("Connected to network.");
+  Terminal.print("Type 'start' to initialize.");
+  Terminal.print("");
 }
 
 async function runShellLoop() {
@@ -49,9 +52,6 @@ async function main() {
   // login -> shell -> (on "exit") back to a fresh login screen, forever.
   while (true) {
     await runLogin();
-    Terminal.print("Connected to network.");
-    Terminal.print("Type 'start' to initialize.");
-    Terminal.print("");
     await runShellLoop();
   }
 }

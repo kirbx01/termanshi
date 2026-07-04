@@ -69,6 +69,12 @@ const Shell = (() => {
     const name = pathParts[pathParts.length - 1];
     return { parent: fsGetNode(parentParts), name, parentParts };
   }
+
+  function isCompactDisplay() {
+    const width = window.innerWidth || screen.width || 0;
+    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    return width < 720 || coarse;
+  }
 //commands individually 
   function cmd_help() { Terminal.print(HELP_TEXT); }
 
@@ -358,23 +364,42 @@ const Shell = (() => {
   const BOOT_TIME = Date.now();
 
   const ASCII_LOGO = [
-
     "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣤⣄⠀⠀⢀⣀⣀⡀⠀⠀⠀⠀",
-"⠀⠀⠀⢠⡾⠛⠳⠶⣤⣀⣠⣤⣤⣴⡟⠁⠀⠙⣷⠟⠋⠉⠉⢿⡀⠀⠀⠀",
-"⠀⠀⠀⣾⠁⠀⠀⠀⠀⠉⠀⠀⠀⡿⠀⢠⣟⣿⠿⠳⢦⣤⡴⣼⣇⠀⠀⠀",
-"⠀⠀⠀⢻⣤⠀⠀⠀⠀⠀⠀⠀⠀⢿⣄⣀⣽⣏⠀⠀⢸⣷⡄⠀⣿⠀⠀⠀",
-"⠀⠀⠀⣼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠀⠉⠓⢾⡟⠛⢁⣼⣟⠀⠀⠀",
-"⠀⢀⣼⣇⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣙⣿⣿⣥⣽⢤⠀⠀",
-"⣀⣈⣷⣏⣁⠀⠀⢀⠀⠉⠙⠻⣶⣾⣳⣶⠟⠉⠁⢀⠀⠀⠀⠶⢻⡟⠒⠒",
-"⠀⠀⠸⣇⣀⠀⠀⠛⠉⠂⠀⢀⡿⣉⣉⢿⡄⠀⠒⠉⠋⠀⠀⠠⣼⠧⢤⠀",
-"⠀⠐⠛⠻⣍⣀⡀⠀⠀⢀⣠⠞⠙⠧⠼⠈⠳⣄⡀⠀⠀⠀⣠⣴⣟⡀⠀⠀",
-"⠀⠀⣠⠴⠛⢿⣭⠿⠿⢯⡅⠀⠀⠀⠀⠀⠀⣠⣭⣩⣭⣭⣿⣋⠈⠙⠂⠀",
-"⠀⠀⠀⠀⢠⡟⠁⠀⠀⠀⣿⠶⠶⠶⠤⠶⣾⠇⠀⠘⣧⠀⠀⢹⡇⠀⠀⠀",
-"⠀⠀⠀⠀⠸⣇⠀⠀⣰⠾⠋⠀⠀⠀⠀⠀⣧⡀⠀⠀⢿⣄⣤⡾⠁⠀⠀⠀",
-"⠀⠀⠀⠀⠀⠈⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⠈⠛⠒⠒⠚⠋⠁⠀⠀⠀⠀⠀",
-"⋆｡‧˚ʚ🍓ɞ˚‧｡⋆",
-
+    "⠀⠀⠀⢠⡾⠛⠳⠶⣤⣀⣠⣤⣤⣴⡟⠁⠀⠙⣷⠟⠋⠉⠉⢿⡀⠀⠀⠀",
+    "⠀⠀⠀⣾⠁⠀⠀⠀⠀⠉⠀⠀⠀⡿⠀⢠⣟⣿⠿⠳⢦⣤⡴⣼⣇⠀⠀⠀",
+    "⠀⠀⠀⢻⣤⠀⠀⠀⠀⠀⠀⠀⠀⢿⣄⣀⣽⣏⠀⠀⢸⣷⡄⠀⣿⠀⠀⠀",
+    "⠀⠀⠀⣼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠀⠉⠓⢾⡟⠛⢁⣼⣟⠀⠀⠀",
+    "⠀⢀⣼⣇⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣙⣿⣿⣥⣽⢤⠀⠀",
+    "⣀⣈⣷⣏⣁⠀⠀⢀⠀⠉⠙⠻⣶⣾⣳⣶⠟⠉⠁⢀⠀⠀⠀⠶⢻⡟⠒⠒",
+    "⠀⠀⠸⣇⣀⠀⠀⠛⠉⠂⠀⢀⡿⣉⣉⢿⡄⠀⠒⠉⠋⠀⠀⠠⣼⠧⢤⠀",
+    "⠀⠐⠛⠻⣍⣀⡀⠀⠀⢀⣠⠞⠙⠧⠼⠈⠳⣄⡀⠀⠀⠀⣠⣴⣟⡀⠀⠀",
+    "⠀⠀⣠⠴⠛⢿⣭⠿⠿⢯⡅⠀⠀⠀⠀⠀⠀⣠⣭⣩⣭⣭⣿⣋⠈⠙⠂⠀",
+    "⠀⠀⠀⠀⢠⡟⠁⠀⠀⠀⣿⠶⠶⠶⠤⠶⣾⠇⠀⠘⣧⠀⠀⢹⡇⠀⠀⠀",
+    "⠀⠀⠀⠀⠸⣇⠀⠀⣰⠾⠋⠀⠀⠀⠀⠀⣧⡀⠀⠀⢿⣄⣤⡾⠁⠀⠀⠀",
+    "⠀⠀⠀⠀⠀⠈⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⠈⠛⠒⠒⠚⠋⠁⠀⠀⠀⠀⠀",
+    "⋆｡‧˚ʚ🍓ɞ˚‧｡⋆",
   ];
+
+  const ASCII_LOGO_NARROW = [
+    "  .--.   .--.",
+    " (    )_(    )",
+    "  \"--`  `--\"",
+    "  panshiOS",
+  ];
+
+  const ASCII_LOGO_COMPACT = [
+    "  /\\_/\\",
+    " ( o.o )",
+    "  > ^ <",
+  ];
+
+  function getAsciiLogo() {
+    const width = window.innerWidth || screen.width || 0;
+    const cols = Terminal.cols || 80;
+    if (width < 560 || cols < 48) return ASCII_LOGO_COMPACT;
+    if (width < 900 || cols < 90) return ASCII_LOGO_NARROW;
+    return ASCII_LOGO;
+  }
 
   function detectOS(ua) {
     if (/Windows/.test(ua)) return "Windows";
@@ -464,7 +489,17 @@ const Shell = (() => {
       "",
       dots,
     ];
-    Terminal.printColumns(ASCII_LOGO, info, 5);
+
+    const ascii = getAsciiLogo();
+    const useSplit = !isCompactDisplay() && window.innerWidth >= 860 && (window.innerHeight / Math.max(window.innerWidth, 1)) < 1.05;
+    if (useSplit) {
+      Terminal.printColumns(ascii, info, 5);
+      return;
+    }
+
+    for (const line of ascii) Terminal.print(line);
+    Terminal.print("");
+    for (const line of info) Terminal.print(line);
   }
 
 //resume.pdf
@@ -547,7 +582,14 @@ const Shell = (() => {
   }
 
   function prompt() {
-    return `${currentUsername}@${currentHostname}:${fsDisplayPath(cwd)}$ `;
+    const compact = isCompactDisplay();
+    const path = fsDisplayPath(cwd);
+    if (compact) {
+      const userHost = `${(currentUsername || "u").charAt(0)}@${(currentHostname || "h").charAt(0)}`;
+      const displayPath = path.length > 10 ? "~" : path;
+      return `${userHost}:${displayPath}$ `;
+    }
+    return `${currentUsername}@${currentHostname}:${path}$ `;
   }
 
   return { execute, prompt, tabComplete, printNeofetch, ASCII_LOGO, cmdHistory };

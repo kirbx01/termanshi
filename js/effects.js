@@ -25,6 +25,16 @@ const CRT = (() => {
     uniform float uGlitch;      // 0..1 intensity of an active sync glitch
     uniform float uGlitchSeed;  // per-glitch random seed
 
+    float computeDistortion(vec2 uv, vec2 cc) {
+      float aspect = uResolution.x / max(uResolution.y, 1.0);
+      float portrait = step(aspect, 1.0);
+      float verticalBias = mix(0.07, 0.12, portrait);
+      float horizontalBias = mix(0.06, 0.03, portrait);
+      float r2 = dot(cc, cc);
+      float curve = 1.0 + (verticalBias * r2) + (horizontalBias * (cc.x * cc.x - cc.y * cc.y) * 0.4);
+      return curve;
+    }
+
     // cheap hash-based pseudo-random
     float rand(vec2 co) {
       return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
@@ -33,11 +43,9 @@ const CRT = (() => {
     void main() {
       vec2 uv = vUv;
 
-      // ---- convex barrel distortion ----
+      // ---- responsive convex barrel distortion ----
       vec2 cc = uv * 2.0 - 1.0;
-      float r2 = dot(cc, cc);
-      float distortion = 0.10;
-      cc *= (1.0 + distortion * r2);
+      cc *= computeDistortion(uv, cc);
       uv = cc * 0.5 + 0.5;
 
       // ---- subtle vertical raster drift ----
@@ -55,7 +63,7 @@ const CRT = (() => {
       }
 
       // ---- RGB chromatic aberration ----
-      float aberration = 0.0016 + uGlitch * 0.004;
+      float aberration = 0.0012 + uGlitch * 0.003;
       vec2 dir = normalize(cc + 0.0001);
       float r = texture2D(uTex, uv - dir * aberration).r;
       float g = texture2D(uTex, uv).g;

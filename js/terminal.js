@@ -76,6 +76,7 @@ const Terminal = (() => {
   let charWidth = 0;
   let cols = 0, rows = 0;
   let dpr = 1;
+  let fontMetrics = { ascent: 12, descent: 3, height: 15 };
 
   function fontStackFor(key) {
     const primary = FONT_FAMILIES[key] || FONT_FAMILIES.jetbrains;
@@ -103,13 +104,22 @@ const Terminal = (() => {
 
   function applyFont() {
     ctx.font = `${FONT_WEIGHT} ${fontSize}px ${fontStackFor(currentFontKey)}`;
-    ctx.textBaseline = "top";
+    ctx.textBaseline = "alphabetic";
+    ctx.textRendering = "geometricPrecision";
+    ctx.fontKerning = "none";
   }
 
   function measure() {
     applyFont();
     const m = ctx.measureText("M");
-    charWidth = Math.round(m.width);
+    charWidth = Math.max(8, Math.round(m.width));
+    const ascent = m.actualBoundingBoxAscent || fontSize * 0.8;
+    const descent = m.actualBoundingBoxDescent || fontSize * 0.2;
+    fontMetrics = {
+      ascent: Math.max(8, Math.round(ascent)),
+      descent: Math.max(2, Math.round(descent)),
+      height: Math.max(10, Math.round(ascent + descent)),
+    };
   }
 
   
@@ -146,6 +156,9 @@ const Terminal = (() => {
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = window.innerWidth;
     const h = window.innerHeight;
+    const padding = Math.max(12, Math.round(Math.min(w, h) * 0.03));
+    padLeft = Math.min(32, padding);
+    padTop = Math.min(28, Math.round(padding * 1.1));
     canvas.width = Math.floor(w * dpr);
     canvas.height = Math.floor(h * dpr);
     canvas.style.width = w + "px";
@@ -153,8 +166,8 @@ const Terminal = (() => {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.imageSmoothingEnabled = false;
     measure();
-    cols = Math.max(20, Math.floor((w - padLeft * 2) / charWidth));
-    rows = Math.max(10, Math.floor((h - padTop * 2) / lineHeight));
+    cols = Math.max(24, Math.floor((w - padLeft * 2) / Math.max(8, charWidth)));
+    rows = Math.max(8, Math.floor((h - padTop * 2) / Math.max(12, lineHeight)));
     render();
   }
 
@@ -162,9 +175,54 @@ const Terminal = (() => {
   // color) or an array of rich segments: [{ text, color? , hue? }].
   // `hue` (a 0-360 offset) renders an animated/static HSL color, used
   // to colourise the neofetch dots individually. `color` is a fixed hex.
+  function wrapText(content, limit) {
+    const text = String(content || "");
+    if (!limit || limit <= 0) return [""];
+    const lines = [];
+    for (const rawLine of text.split("\n")) {
+      if (!rawLine) {
+        lines.push("");
+        continue;
+      }
+      const words = rawLine.split(/(\s+)/).filter(Boolean);
+      let current = "";
+      for (const token of words) {
+        if (/^\s+$/.test(token)) {
+          if (current && current.length + token.length <= limit) {
+            current += token;
+          } else if (current) {
+            lines.push(current);
+            current = "";
+          }
+          continue;
+        }
+        if (!current) {
+          if (token.length <= limit) {
+            current = token;
+          } else {
+            let chunk = token;
+            while (chunk.length > limit) {
+              lines.push(chunk.slice(0, limit));
+              chunk = chunk.slice(limit);
+            }
+            current = chunk;
+          }
+          continue;
+        }
+        if (current.length + 1 + token.length <= limit) {
+          current += ` ${token}`;
+        } else {
+          lines.push(current);
+          current = token.length <= limit ? token : token.slice(0, limit);
+        }
+      }
+      if (current) lines.push(current);
+    }
+    return lines;
+  }
+
   function drawTextRow(content, rowIndex) {
-    // pixel-snap y for crisp, non-blurry glyphs
-    const y = Math.round(padTop + rowIndex * lineHeight);
+    const baseY = Math.round(padTop + rowIndex * lineHeight + fontMetrics.ascent + 2);
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
 
@@ -173,9 +231,9 @@ const Terminal = (() => {
       for (const seg of content) {
         const c = seg.color || (seg.hue !== undefined ? hslColor(seg.hue) : baseColor());
         ctx.shadowColor = c;
-        ctx.shadowBlur = GLOW_BLUR;   // constant every frame -> static glow
+        ctx.shadowBlur = GLOW_BLUR;
         ctx.fillStyle = c;
-        ctx.fillText(seg.text, Math.round(x), y);
+        ctx.fillText(seg.text, Math.round(x), baseY);
         x += ctx.measureText(seg.text).width;
       }
       return;
@@ -183,20 +241,21 @@ const Terminal = (() => {
 
     const c = baseColor();
     ctx.shadowColor = c;
-    ctx.shadowBlur = GLOW_BLUR;   // constant every frame -> static glow
+    ctx.shadowBlur = GLOW_BLUR;
     ctx.fillStyle = c;
-    ctx.fillText(content, Math.round(padLeft), y);
+    ctx.fillText(String(content), Math.round(padLeft), baseY);
   }
 
   function drawCursorBlock(colIndex, rowIndex) {
     if (!cursorVisible) return;
     const x = Math.round(padLeft + colIndex * charWidth);
-    const y = Math.round(padTop + rowIndex * lineHeight);
+    const baseY = Math.round(padTop + rowIndex * lineHeight + fontMetrics.ascent + 2);
+    const cursorHeight = Math.max(2, Math.round(lineHeight - 4));
     const c = baseColor();
     ctx.shadowColor = c;
     ctx.shadowBlur = GLOW_BLUR;
     ctx.fillStyle = c;
-    ctx.fillRect(x, y, charWidth, lineHeight - 3);
+    ctx.fillRect(x, baseY - 1, charWidth, cursorHeight);
   }
 
   function render() {
@@ -280,7 +339,10 @@ const Terminal = (() => {
 
   function print(text) {
     const parts = String(text).split("\n");
-    for (const p of parts) lines.push(p);
+    for (const p of parts) {
+      const wrapped = wrapText(p, cols || 80);
+      for (const line of wrapped) lines.push(line);
+    }
     if (lines.length > MAX_SCROLLBACK) lines = lines.slice(-MAX_SCROLLBACK);
     render();
   }
@@ -343,9 +405,10 @@ const Terminal = (() => {
       inputResolver = resolve;
       inputReject = reject;
       render();
-      if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) {
-        const panel = document.getElementById('mobile-keyboard');
-        if (panel) panel.classList.add('visible');
+      const hiddenInput = document.getElementById("hidden-input");
+      if (hiddenInput) {
+        hiddenInput.value = "";
+        hiddenInput.focus({ preventScroll: true });
       }
     });
   }
@@ -362,8 +425,8 @@ const Terminal = (() => {
     inputResolver = null;
     inputReject = null;
     render();
-    const panel = document.getElementById('mobile-keyboard');
-    if (panel) panel.classList.remove('visible');
+    const hiddenInput = document.getElementById("hidden-input");
+    if (hiddenInput) hiddenInput.value = "";
     if (resolve) resolve(typed);
   }
 
@@ -701,6 +764,87 @@ const Terminal = (() => {
     });
   }
 
+  const hiddenInput = document.getElementById("hidden-input");
+
+  function focusHiddenInput() {
+    if (hiddenInput) {
+      hiddenInput.focus({ preventScroll: true });
+    }
+  }
+
+  hiddenInput?.addEventListener("input", () => {
+    if (!hiddenInput) return;
+    const value = hiddenInput.value;
+    if (!value) return;
+    hiddenInput.value = "";
+    if (!liveLine) return;
+    insertText(value.replace(/\r?\n/g, ""));
+  });
+
+  hiddenInput?.addEventListener("keydown", (e) => {
+    if (!liveLine) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      TermAudio.enter();
+      finalizeLine();
+      return;
+    }
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      if (liveLine.cursor > 0) {
+        liveLine.typed = liveLine.typed.slice(0, liveLine.cursor - 1) + liveLine.typed.slice(liveLine.cursor);
+        liveLine.cursor--;
+        TermAudio.tick();
+        render();
+      }
+      return;
+    }
+    if (e.key === "Tab") {
+      e.preventDefault();
+      if (tabHandler) {
+        const completed = tabHandler(liveLine.typed);
+        if (typeof completed === "string") {
+          liveLine.typed = completed;
+          liveLine.cursor = liveLine.typed.length;
+          render();
+        }
+      }
+      return;
+    }
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      liveLine.cursor = Math.max(0, liveLine.cursor - 1);
+      render();
+      return;
+    }
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      liveLine.cursor = Math.min(liveLine.typed.length, liveLine.cursor + 1);
+      render();
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (currentHistory && currentHistory.length) {
+        historyIndex = Math.max(0, historyIndex - 1);
+        liveLine.typed = currentHistory[historyIndex] || "";
+        liveLine.cursor = liveLine.typed.length;
+        render();
+      }
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (currentHistory && currentHistory.length) {
+        historyIndex = Math.min(currentHistory.length, historyIndex + 1);
+        liveLine.typed = currentHistory[historyIndex] || "";
+        liveLine.cursor = liveLine.typed.length;
+        render();
+      }
+      return;
+    }
+  });
+
   window.addEventListener("keydown", (e) => {
     TermAudio.unlock();
     if (mode === "nano") {
@@ -713,53 +857,10 @@ const Terminal = (() => {
   });
 
   window.addEventListener("resize", resize);
-
-  document.addEventListener("click", (event) => {
-    const button = event.target.closest('#mobile-keyboard button');
-    if (!button) return;
-    const key = button.getAttribute('data-key');
-    if (!key) return;
-    event.preventDefault();
-    if (key === 'Backspace') {
-      if (liveLine) {
-        if (liveLine.cursor > 0) {
-          liveLine.typed = liveLine.typed.slice(0, liveLine.cursor - 1) + liveLine.typed.slice(liveLine.cursor);
-          liveLine.cursor--;
-          TermAudio.tick();
-          render();
-        }
-      }
-      return;
-    }
-    if (key === 'Enter') {
-      if (liveLine) {
-        TermAudio.enter();
-        finalizeLine();
-      }
-      return;
-    }
-    if (key === 'Tab') {
-      if (liveLine && tabHandler) {
-        const completed = tabHandler(liveLine.typed);
-        if (typeof completed === 'string') {
-          liveLine.typed = completed;
-          liveLine.cursor = liveLine.typed.length;
-          render();
-        }
-      }
-      return;
-    }
-    if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
-      if (!liveLine) return;
-      const eventKey = { key };
-      handleShellKey(eventKey);
-      return;
-    }
-    if (key === 'Space') {
-      insertText(' ');
-      return;
-    }
-    insertText(key);
+  window.addEventListener("pointerdown", focusHiddenInput, { passive: true });
+  document.addEventListener("pointerdown", (event) => {
+    if (event.target instanceof HTMLElement && event.target.closest("button, input")) return;
+    focusHiddenInput();
   });
 
   async function loadFonts() {

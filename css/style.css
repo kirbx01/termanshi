@@ -45,36 +45,12 @@ html, body {
   background: transparent;
 }
 
-#mobile-keyboard {
+#hidden-input {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: none;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  padding: 0.5rem;
-  background: rgba(0, 0, 0, 0.9);
-  border-top: 1px solid rgba(255,255,255,0.2);
-  z-index: 20;
-}
-
-#mobile-keyboard.visible {
-  display: flex;
-}
-
-#mobile-keyboard button {
-  border: 1px solid rgba(255,255,255,0.16);
-  background: rgba(255,255,255,0.06);
-  color: #e8fff7;
-  padding: 0.4rem 0.45rem;
-  font: inherit;
-  border-radius: 0.2rem;
-  min-width: 2.3rem;
-}
-
-@media (pointer: coarse) {
-  #mobile-keyboard {
-    display: flex;
-  }
+  left: -9999px;
+  top: -9999px;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
 }
