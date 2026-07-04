@@ -246,16 +246,22 @@ const Terminal = (() => {
     ctx.fillText(String(content), Math.round(padLeft), baseY);
   }
 
-  function drawCursorBlock(colIndex, rowIndex) {
+  function getCursorX(text, colIndex) {
+    const safeText = String(text || "");
+    const safeCol = Math.max(0, Math.min(safeText.length, colIndex || 0));
+    return Math.round(padLeft + ctx.measureText(safeText.slice(0, safeCol)).width);
+  }
+
+  function drawCursorBlock(text, colIndex, rowIndex) {
     if (!cursorVisible) return;
-    const x = Math.round(padLeft + colIndex * charWidth);
-    const baseY = Math.round(padTop + rowIndex * lineHeight + fontMetrics.ascent + 2);
+    const x = getCursorX(text, colIndex);
+    const y = Math.round(padTop + rowIndex * lineHeight + 1);
     const cursorHeight = Math.max(2, Math.round(lineHeight - 4));
     const c = baseColor();
     ctx.shadowColor = c;
     ctx.shadowBlur = GLOW_BLUR;
     ctx.fillStyle = c;
-    ctx.fillRect(x, baseY - 1, charWidth, cursorHeight);
+    ctx.fillRect(x, y, Math.max(2, Math.round(charWidth * 0.7)), cursorHeight);
   }
 
   function render() {
@@ -296,7 +302,7 @@ const Terminal = (() => {
     if (liveLine) {
       const lastRow = startRow + visible.length - 1;
       const col = liveLine.prefix.length + liveLine.cursor;
-      drawCursorBlock(col, lastRow);
+      drawCursorBlock(visible[lastRow], col, lastRow);
     }
   }
 
@@ -322,7 +328,7 @@ const Terminal = (() => {
     for (let i = 0; i < visible.length; i++) {
       drawTextRow(visible[i], 1 + i);
     }
-    drawCursorBlock(curCol, 1 + (curLine - scrollTop));
+    drawCursorBlock(visible[curLine - scrollTop] || "", curCol, 1 + (curLine - scrollTop));
 
     const footer = " ^X Exit    ^O Save    (read-only preview editor)";
     drawTextRow(footer, rows - 1);
