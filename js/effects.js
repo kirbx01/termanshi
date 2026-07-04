@@ -1,24 +1,3 @@
-/* ================================================================
-   EFFECTS.JS
-   The WebGL CRT compositor. text-canvas (a plain 2D canvas full of
-   crisp glowing text) is sampled as a texture and pushed through a
-   fragment shader that applies:
-
-     - convex barrel distortion (curved glass geometry)
-     - vignette
-     - RGB chromatic aberration
-     - phosphor mask / aperture grille
-     - scanlines
-     - subtle animated noise
-     - brightness flicker
-     - horizontal VHS-style sync glitch every 10-20s
-     - subtle vertical raster drift
-
-   All effects are tuned to stay subtle and never hurt readability.
-   Text glow itself is NOT generated here - it is static (constant
-   shadowBlur) canvas glow baked into text-canvas by terminal.js.
-================================================================ */
-
 const CRT = (() => {
   const canvas = document.getElementById("crt-canvas");
   const gl = canvas.getContext("webgl", { antialias: true, alpha: false });
@@ -180,7 +159,7 @@ const CRT = (() => {
   function loop(now) {
     const t = (now - startTime) / 1000;
 
-    // schedule / run the periodic sync glitch
+    //glitchcrt
     if (now > nextGlitchAt && now > glitchActiveUntil) {
       glitchActiveUntil = now + 120 + Math.random() * 160; // brief, ~120-280ms
       glitchSeed = Math.random() * 100.0;

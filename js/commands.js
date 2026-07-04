@@ -404,6 +404,13 @@ const Shell = (() => {
     return node && node.type === "dir" ? Object.keys(node.children).length : 0;
   }
 
+  async function storageEstimateWithTimeout(timeout = 300) {
+    if (!navigator.storage || !navigator.storage.estimate) return null;
+    const estimatePromise = navigator.storage.estimate();
+    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), timeout));
+    return Promise.race([estimatePromise, timeoutPromise]);
+  }
+
   async function printNeofetch() {
     const ua = navigator.userAgent || "";
     const os = detectOS(ua);
@@ -415,14 +422,16 @@ const Shell = (() => {
     const uptime = formatUptime(Date.now() - BOOT_TIME);
 
     let storageLine = "unavailable";
-    if (navigator.storage && navigator.storage.estimate) {
-      try {
-        const { usage, quota } = await navigator.storage.estimate();
-        const usedGB = (usage / 1073741824).toFixed(2);
-        const quotaGB = (quota / 1073741824).toFixed(2);
-        const pct = quota ? Math.round((usage / quota) * 100) : 0;
+    try {
+      const estimate = await storageEstimateWithTimeout(300);
+      if (estimate && typeof estimate.usage === "number" && typeof estimate.quota === "number") {
+        const usedGB = (estimate.usage / 1073741824).toFixed(2);
+        const quotaGB = (estimate.quota / 1073741824).toFixed(2);
+        const pct = estimate.quota ? Math.round((estimate.usage / estimate.quota) * 100) : 0;
         storageLine = `${usedGB} GiB / ${quotaGB} GiB (${pct}%)`;
-      } catch (e) { /* leave as unavailable */ }
+      }
+    } catch (e) {
+      /* leave as unavailable */
     }
 
     const projects = countChildren(["home", defaultHome, "projects"]);
@@ -463,8 +472,8 @@ const Shell = (() => {
     return new Promise((resolve, reject) => {
       try {
         const a = document.createElement("a");
-        a.href = "./js/assets/resume.pdf";
-        a.download = "resume.pdf";
+        a.href = "./js/assets/resume109.pdf";
+        a.download = "resume109.pdf";
         a.style.display = "none";
         document.body.appendChild(a);
         a.click();
