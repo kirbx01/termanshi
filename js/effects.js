@@ -1,6 +1,7 @@
 const CRT = (() => {
   const canvas = document.getElementById("crt-canvas");
-  const gl = canvas.getContext("webgl", { antialias: true, alpha: false });
+  const IS_FIREFOX = /Firefox\//.test(navigator.userAgent || "");
+  const gl = canvas.getContext("webgl", { antialias: !IS_FIREFOX, alpha: false });
 
   if (!gl) {
     console.warn("WebGL unavailable - CRT effect disabled.");
@@ -142,6 +143,7 @@ const CRT = (() => {
 
   let sourceCanvas = null;
   let startTime = performance.now();
+  let lastFrameAt = 0;
 
   // glitch scheduling: fires roughly every 10-20 seconds, per spec
   let nextGlitchAt = performance.now() + (10000 + Math.random() * 10000);
@@ -149,7 +151,7 @@ const CRT = (() => {
   let glitchSeed = 0;
 
   function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, IS_FIREFOX ? 1.25 : 2);
     canvas.width = Math.floor(window.innerWidth * dpr);
     canvas.height = Math.floor(window.innerHeight * dpr);
     canvas.style.width = window.innerWidth + "px";
@@ -165,6 +167,13 @@ const CRT = (() => {
   }
 
   function loop(now) {
+    const frameBudget = IS_FIREFOX ? 33.33 : 16.66;
+    if (now - lastFrameAt < frameBudget) {
+      requestAnimationFrame(loop);
+      return;
+    }
+    lastFrameAt = now;
+
     const t = (now - startTime) / 1000;
 
     //glitchcrt

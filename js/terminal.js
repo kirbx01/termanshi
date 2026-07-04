@@ -7,7 +7,8 @@ const Terminal = (() => {
   // Default scheme is an animated RGB cycle (gaming-style hue shift).
   // `color <name>` (see commands.js) can switch to a fixed theme instead.
   const BG = "#000000";
-  const GLOW_BLUR = 7;            // STATIC glow amount - never animated
+  const IS_FIREFOX = /Firefox\//.test(navigator.userAgent || "");
+  const GLOW_BLUR = IS_FIREFOX ? 4 : 7;            // STATIC glow amount - never animated
 
   const THEMES = {
     rgb:    { mode: "rgb" },
@@ -41,7 +42,7 @@ const Terminal = (() => {
   function ensureRgbAnim() {
     const needsAnim = (THEMES[currentTheme] || {}).mode === "rgb";
     if (needsAnim && !rgbAnimTimer) {
-      rgbAnimTimer = setInterval(render, 60);
+      rgbAnimTimer = setInterval(render, IS_FIREFOX ? 80 : 60);
     } else if (!needsAnim && rgbAnimTimer) {
       clearInterval(rgbAnimTimer);
       rgbAnimTimer = null;
@@ -153,7 +154,7 @@ const Terminal = (() => {
   }
 
   function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, IS_FIREFOX ? 1.25 : 2);
     const w = window.innerWidth;
     const h = window.innerHeight;
     const padding = Math.max(12, Math.round(Math.min(w, h) * 0.03));
