@@ -1,22 +1,9 @@
-/* ================================================================
-   TERMINAL.JS
-   Renders EVERY character of this pseudo OS onto a 2D <canvas> -
-   there is no DOM text anywhere. Owns the scrollback buffer, the
-   blinking block cursor, keyboard input (with history + tab
-   completion), and a minimal full-screen nano editor mode.
-
-   Text glow is produced with a fixed (non-animated) canvas shadow -
-   ctx.shadowBlur is a constant value on every draw call, so the
-   glow never pulses or breathes. Only the WebGL layer in effects.js
-   animates (flicker/noise/glitch), which is a separate CRT effect,
-   not the text glow itself.
-================================================================ */
 
 const Terminal = (() => {
   const canvas = document.getElementById("text-canvas");
   const ctx = canvas.getContext("2d", { alpha: false });
 
-  // ---- palette -----------------------------------------------------
+  
   // Default scheme is an animated RGB cycle (gaming-style hue shift).
   // `color <name>` (see commands.js) can switch to a fixed theme instead.
   const BG = "#000000";
@@ -95,7 +82,7 @@ const Terminal = (() => {
     return `${primary}, "JetBrains Mono", "IBM Plex Mono", "Space Mono", monospace`;
   }
 
-  // ---- state -----------------------------------------------------
+  //state
   let lines = [];              // committed scrollback (shell mode)
   const MAX_SCROLLBACK = 3000;
   let mode = "shell";          // "shell" | "nano" | "game"
@@ -114,9 +101,6 @@ const Terminal = (() => {
   // nano mode state
   let nano = null; // { filename, buffer(string), cursor(index), statusMsg }
 
-  // ---------------------------------------------------------------
-  // font metrics / sizing
-  // ---------------------------------------------------------------
   function applyFont() {
     ctx.font = `${FONT_WEIGHT} ${fontSize}px ${fontStackFor(currentFontKey)}`;
     ctx.textBaseline = "top";
@@ -128,7 +112,7 @@ const Terminal = (() => {
     charWidth = Math.round(m.width);
   }
 
-  // ---- setfont API ---------------------------------------------------
+  
   function setFontSize(px) {
     const clamped = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, Math.round(px)));
     const changed = clamped !== fontSize;
@@ -174,9 +158,6 @@ const Terminal = (() => {
     render();
   }
 
-  // ---------------------------------------------------------------
-  // low level drawing
-  // ---------------------------------------------------------------
   // `content` is either a plain string (rendered in the current theme
   // color) or an array of rich segments: [{ text, color? , hue? }].
   // `hue` (a 0-360 offset) renders an animated/static HSL color, used
@@ -288,9 +269,7 @@ const Terminal = (() => {
     drawTextRow(footer, rows - 1);
   }
 
-  // ---------------------------------------------------------------
-  // blinking cursor
-  // ---------------------------------------------------------------
+//cursor
   function startBlink() {
     if (blinkTimer) return;
     blinkTimer = setInterval(() => {
@@ -299,9 +278,6 @@ const Terminal = (() => {
     }, 500);
   }
 
-  // ---------------------------------------------------------------
-  // scrollback output API
-  // ---------------------------------------------------------------
   function print(text) {
     const parts = String(text).split("\n");
     for (const p of parts) lines.push(p);
@@ -357,9 +333,7 @@ const Terminal = (() => {
     }
   }
 
-  // ---------------------------------------------------------------
-  // input handling
-  // ---------------------------------------------------------------
+//input handling 
   function readLine({ prefix = "", mask = null, history = null, onTab = null } = {}) {
     return new Promise((resolve, reject) => {
       liveLine = { prefix, typed: "", cursor: 0, mask };
@@ -571,11 +545,9 @@ const Terminal = (() => {
     }
   }
 
-  // ---------------------------------------------------------------
   // fun commands: matrix rain + tic-tac-toe
   // both take over the canvas directly (like nano mode) and hand
   // control back to the shell once the visitor exits.
-  // ---------------------------------------------------------------
   function runMatrix() {
     return new Promise((resolve) => {
       mode = "game";
@@ -729,9 +701,6 @@ const Terminal = (() => {
     });
   }
 
-  // ---------------------------------------------------------------
-  // global key dispatch
-  // ---------------------------------------------------------------
   window.addEventListener("keydown", (e) => {
     TermAudio.unlock();
     if (mode === "nano") {
