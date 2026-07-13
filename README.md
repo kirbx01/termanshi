@@ -1,6 +1,6 @@
 ﻿# Termanshi
 
-A retro terminal-style portfolio website that behaves like a pseudo Linux shell. It is designed as a reusable template for anyone who wants to turn their portfolio into an interactive terminal like experience Portfolio
+A retro terminal-style portfolio website that behaves like a pseudo Linux shell. It is designed as a reusable template for anyone who wants to turn their portfolio into an interactive terminal like experience portfolio. 
 
 ## What it is
 
