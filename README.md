@@ -31,9 +31,10 @@ The filesystem is defined in filesystem.js. That file controls:
 - folders like projects, socials, and graphics
 - files shown in the terminal
 - links opened by curl
-- any custom text content for cat and other commands
+- any custom text content for cat and other commands; you can check [shell commands](https://explainshell.com) here and add them. 
 
 ## Notes
 
 - The project is intentionally styled as more like an emulation of termux.
-  - Open to Contributions just maintain the basic [code of conduct](https://www.contributor-covenant.org) 
+- Open to Contributions just maintain the basic [code of conduct](https://www.contributor-covenant.org)
+- Open to first contributions too since i m also a beginner ˚.⋆꒰১ ໒꒱⋆.˚
