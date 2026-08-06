@@ -11,13 +11,12 @@ Well clearly a portfolio website.
 ## Customize the identity
 
 Edit js/config.js and change:
-- ownerName
-- hostname
-- welcomeMessage
-- siteTitle
-- homeDirName
-
-  if you take a fancy to >///<
+> ownerName
+> hostname
+> welcomeMessage
+> siteTitle
+> homeDirName
+if you take a fancy to >///<
 
 Example:
 
