@@ -13,37 +13,15 @@ html, body {
   min-height: 100%;
   overflow: hidden;
   cursor: default;
-  background: #f5f1ec;
-}
-
-#monitor {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 45px;
-  background: #f5f1ec;
-}
-
-#monitor::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 60px;
-  background: radial-gradient(circle at top, rgba(255,255,255,0.9), rgba(255,255,255,0.62));
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.85), inset 0 14px 35px rgba(255,255,255,0.6), 0 35px 90px rgba(0,0,0,0.12);
-  pointer-events: none;
+  background: #ffffff;
 }
 
 #screen {
-  position: relative;
-  width: min(98vw, 1180px);
-  height: min(84vh, 760px);
-  max-height: 760px;
-  background: #080808;
-  border-radius: 36px;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), inset 0 0 30px rgba(255,255,255,0.05), 0 26px 60px rgba(0,0,0,0.22);
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000000;
   overflow: hidden;
 }
 
@@ -61,28 +39,6 @@ html, body {
   inset: 0;
   width: 100%;
   height: 100%;
-  display: block;
-}
-
-#monitor-logo {
-  position: absolute;
-  left: 50%;
-  bottom: 22px;
-  transform: translateX(-50%);
-  width: 170px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #fbfaf8 0%, #dbd6d0 100%);
-  border: 1px solid rgba(0,0,0,0.08);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.9), 0 10px 25px rgba(0,0,0,0.1);
-}
-
-#monitor-logo img {
-  max-height: 70%;
-  width: auto;
   display: block;
 }
 
