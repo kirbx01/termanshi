@@ -26,6 +26,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          api-url: https://api.github.com
+          enablement: github_pages
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
