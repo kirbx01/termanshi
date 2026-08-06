@@ -36,4 +36,4 @@ The filesystem is defined in filesystem.js. That file controls:
 ## Notes
 
 - The project is intentionally styled as more like an emulation of termux.
-  - Open to Contributions just maintain the basic [code of conduct] (https://www.contributor-covenant.org) 
+  - Open to Contributions just maintain the basic [code of conduct](https://www.contributor-covenant.org) 
