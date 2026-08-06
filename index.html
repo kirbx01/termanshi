@@ -12,22 +12,27 @@
 </head>
 <body>
 
-  <!-- The whole viewport is the monitor. -->
-  <div id="screen">
+  <div id="monitor">
+    <!-- The whole viewport is the monitor. -->
+    <div id="screen">
 
-    <!-- text-canvas: 2D canvas where every character of the OS is drawn.
-         Not to be shown directly and only exists as a
-         WebGL texture source for the CRT compositor below. (info for cloners) -->
-    <canvas id="text-canvas"></canvas>
+      <!-- text-canvas: 2D canvas where every character of the OS is drawn.
+           Not to be shown directly and only exists as a
+           WebGL texture source for the CRT compositor below. (info for cloners) -->
+      <canvas id="text-canvas"></canvas>
 
-    <!-- crt-canvas: WebGL canvas that samples text-canvas as a texture and
-         applies barrel distortion, chromatic aberration, vignette, phosphor
-         mask/aperture grille, scanlines, flicker, noise, sync glitches and
-         raster drift. This is the only thing the visitor actually sees. -->
-    <canvas id="crt-canvas"></canvas>
+      <!-- crt-canvas: WebGL canvas that samples text-canvas as a texture and
+           applies barrel distortion, chromatic aberration, vignette, phosphor
+           mask/aperture grille, scanlines, flicker, noise, sync glitches and
+           raster drift. This is the only thing the visitor actually sees. -->
+      <canvas id="crt-canvas"></canvas>
 
-    <input id="hidden-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" aria-label="Terminal input" />
+      <input id="hidden-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" aria-label="Terminal input" />
 
+    </div>
+    <div id="monitor-logo">
+      <img src="assets/Sony_logo.svg" alt="Sony Logo">
+    </div>
   </div>
 
   <script src="js/audio.js"></script>
