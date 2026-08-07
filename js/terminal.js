@@ -8,7 +8,7 @@ const Terminal = (() => {
   // `color <name>` (see commands.js) can switch to a fixed theme instead.
   const BG = "#000000";
   const IS_FIREFOX = /Firefox\//.test(navigator.userAgent || "");
-  const GLOW_BLUR = IS_FIREFOX ? 4 : 7;            // STATIC glow amount - never animated
+  const GLOW_BLUR = IS_FIREFOX ? 6 : 12;            // STATIC glow amount - never animated
 
   const THEMES = {
     rgb:    { mode: "rgb" },
@@ -16,13 +16,13 @@ const Terminal = (() => {
     red:    { mode: "static", color: "#ff4d4d" },
     green:  { mode: "static", color: "#39ff6a" },
     blue:   { mode: "static", color: "#4da6ff" },
-    amber:  { mode: "static", color: "#ffb347" },
+    amber:  { mode: "static", color: "#ffbf00" },
     cyan:   { mode: "static", color: "#4dffef" },
     purple: { mode: "static", color: "#c17cff" },
     white:  { mode: "static", color: "#f2f2f2" },
   };
   const THEME_NAMES = Object.keys(THEMES);
-  let currentTheme = "rgb";
+  let currentTheme = "amber";
   let rgbAnimTimer = null;
 
   // eight evenly-spread hues used to colourise the neofetch dots
@@ -792,12 +792,14 @@ const Terminal = (() => {
     if (!liveLine) return;
     if (e.key === "Enter") {
       e.preventDefault();
+      e.stopImmediatePropagation();
       TermAudio.enter();
       finalizeLine();
       return;
     }
     if (e.key === "Backspace") {
       e.preventDefault();
+      e.stopImmediatePropagation();
       if (liveLine.cursor > 0) {
         liveLine.typed = liveLine.typed.slice(0, liveLine.cursor - 1) + liveLine.typed.slice(liveLine.cursor);
         liveLine.cursor--;
@@ -808,6 +810,7 @@ const Terminal = (() => {
     }
     if (e.key === "Tab") {
       e.preventDefault();
+      e.stopImmediatePropagation();
       if (tabHandler) {
         const completed = tabHandler(liveLine.typed);
         if (typeof completed === "string") {
@@ -820,18 +823,21 @@ const Terminal = (() => {
     }
     if (e.key === "ArrowLeft") {
       e.preventDefault();
+      e.stopImmediatePropagation();
       liveLine.cursor = Math.max(0, liveLine.cursor - 1);
       render();
       return;
     }
     if (e.key === "ArrowRight") {
       e.preventDefault();
+      e.stopImmediatePropagation();
       liveLine.cursor = Math.min(liveLine.typed.length, liveLine.cursor + 1);
       render();
       return;
     }
     if (e.key === "ArrowUp") {
       e.preventDefault();
+      e.stopImmediatePropagation();
       if (currentHistory && currentHistory.length) {
         historyIndex = Math.max(0, historyIndex - 1);
         liveLine.typed = currentHistory[historyIndex] || "";
@@ -842,6 +848,7 @@ const Terminal = (() => {
     }
     if (e.key === "ArrowDown") {
       e.preventDefault();
+      e.stopImmediatePropagation();
       if (currentHistory && currentHistory.length) {
         historyIndex = Math.min(currentHistory.length, historyIndex + 1);
         liveLine.typed = currentHistory[historyIndex] || "";
@@ -853,6 +860,7 @@ const Terminal = (() => {
   });
 
   window.addEventListener("keydown", (e) => {
+    if (e.target === hiddenInput && mode === "shell") return;
     TermAudio.unlock();
     if (mode === "nano") {
       handleNanoKey(e);

@@ -13,7 +13,7 @@ html, body {
   min-height: 100%;
   overflow: hidden;
   cursor: default;
-  background: #ffffff;
+  background: #050505;
 }
 
 #screen {
@@ -21,8 +21,47 @@ html, body {
   inset: 0;
   width: 100vw;
   height: 100vh;
-  background: #000000;
+  background: radial-gradient(circle at 50% 5%, rgba(255, 190, 80, 0.05), transparent 18%),
+              linear-gradient(180deg, #080808 0%, #000000 100%);
   overflow: hidden;
+}
+
+#screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 80px rgba(255, 155, 0, 0.08);
+  pointer-events: none;
+}
+
+#power-button {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 20;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 215, 95, 0.25);
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffd75f;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  display: grid;
+  place-items: center;
+}
+
+#power-button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 18px rgba(255, 215, 95, 0.35);
+}
+
+#power-button.power-on {
+  background: rgba(255, 215, 95, 0.08);
+  box-shadow: 0 0 22px rgba(255, 190, 40, 0.4);
 }
 
 #text-canvas {

@@ -592,5 +592,5 @@ const Shell = (() => {
     return `${currentUsername}@${currentHostname}:${path}$ `;
   }
 
-  return { execute, prompt, tabComplete, printNeofetch, ASCII_LOGO, cmdHistory };
+  return { execute, prompt, tabComplete, printNeofetch, ASCII_LOGO, cmdHistory, helpText: HELP_TEXT };
 })();
