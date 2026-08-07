@@ -1,29 +1,19 @@
 /* on browser load */
 
 const BOOT_LINES = [
-  "Initializing BIOS...",
-  "Loading kernel...",
-  "Loading initramfs...",
-  "Mounting filesystem...",
-  "Starting services...",
-  "Network online.",
-  "Loading shell...",
-  "Ready.",
-];
-
-const GRUB_LINES = [
-  "GNU GRUB 2.06",
-  "Loading boot menu...",
-  "Loading kernel from /boot/vmlinuz-portfolio...",
-  "Booting default entry...",
-];
-
-let powerOn = false;
-let powerButton = null;
-let powerResolve = null;
-
-function updatePowerButton() {
-  if (!powerButton) return;
+  "Kernel panic: not syncing: Attempted to kill init!",
+  "Booting Linux 6.2.0-portfolio ...",
+  "Initializing cgroup subsys cpuset",
+  "Initializing cgroup subsys cpu",
+  "Initializing cgroup subsys cpuacct",
+  "Linux version 6.2.0-portfolio (panshi@portfolio) (gcc version 13.3.0) #1 SMP PREEMPT x86_64",
+  "Command line: ro quiet splash",
+  "Kernel command line: ro quiet splash",
+  "Kernel command in: /boot/vmlinuz-portfolio",
+  "Kernel loaded successfully.",
+  "Starting initramfs ...",
+  "Loading drivers...",
+  "dracut: starting service...",  if (!powerButton) return;
   powerButton.textContent = powerOn ? "⏻" : "⏼";
   powerButton.classList.toggle("power-on", powerOn);
   powerButton.classList.toggle("power-off", !powerOn);
