@@ -13,7 +13,7 @@ html, body {
   min-height: 100%;
   overflow: hidden;
   cursor: default;
-  background: #050505;
+  background: #d8ffde;
 }
 
 #screen {
@@ -22,7 +22,7 @@ html, body {
   width: 100vw;
   height: 100vh;
   background: radial-gradient(circle at 50% 5%, rgba(255, 190, 80, 0.05), transparent 18%),
-              linear-gradient(180deg, #080808 0%, #000000 100%);
+              linear-gradient(180deg, #080808 0%, #f7f7f7 100%);
   overflow: hidden;
 }
 
@@ -42,26 +42,20 @@ html, body {
   z-index: 20;
   width: 44px;
   height: 44px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 215, 95, 0.25);
-  background: rgba(0, 0, 0, 0.35);
-  color: #ffd75f;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 191, 0, 0.25);
+  background: #ffd75f;
+  color: #000000;
   font-size: 20px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
   display: grid;
   place-items: center;
 }
 
-#power-button:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 18px rgba(255, 215, 95, 0.35);
-}
 
 #power-button.power-on {
-  background: rgba(255, 215, 95, 0.08);
-  box-shadow: 0 0 22px rgba(255, 190, 40, 0.4);
+  background: rgba(65, 125, 0, 0.402);
 }
 
 #text-canvas {

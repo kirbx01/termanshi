@@ -18,8 +18,12 @@ const FS_ROOT = dir({
 
       "about.txt": file(
 `Priyanshi, 19F, Delhi, India
-Exploring Low Level Systems, Embedded Firmware, and Real-time Graphics.
-I like to build things that are small, fast, and deterministic.
+Exploring Technologia :brokenheartemoji: 𓇢𓆸
+I like to build things that are small, fast, and deterministic and larp larp larp larp larp larp larp larp 
+larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp 
+larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp 
+larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp 
+larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp  
 I also like to make them look nice while doing it, but it never looks so, well....`),
 
 //skills
