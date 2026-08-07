@@ -45,12 +45,7 @@ const BOOT_LINES = [
   "[    0.900000] systemd[1]: Started udev Kernel Device Manager.",
   "[    1.000000] systemd[1]: Started Load Kernel Modules.",
   "[    1.100000] systemd[1]: Reached target Network.",
-  "[    1.200000] systemd[1]: Started Getty on tty1.",
-];
-
-const TTY_LINES = [
-  "\nWelcome to portfolio tty1.",
-  "",
+  "[    1.200000] systemd[1]: Started getty service.",
 ];
 
 let powerOn = false;
@@ -83,23 +78,19 @@ async function runBootSequence() {
   await Terminal.sleep(300);
 }
 
-async function runTtyLogin() {
+async function runLogin() {
   Terminal.clear();
-  for (const line of TTY_LINES) {
-    Terminal.print(line);
-    await Terminal.sleep(120);
-  }
-  await Terminal.print("tty1 login: ");
-  await Terminal.readLine({ prefix: "tty1 login: " });
+  await Terminal.readLine({ prefix: "login: " });
   await Terminal.readLine({ prefix: "Password: ", mask: "-" });
-  Terminal.print("Login incorrect");
-  await Terminal.sleep(500);
+  Terminal.print("Authenticating...");
+  await Terminal.sleep(650);
+  Terminal.print("Access granted.");
+  await Terminal.sleep(350);
+  const config = window.PORTFOLIO_CONFIG || {};
+  Terminal.print(config.welcomeMessage || "Welcome back, viewer.");
+  await Terminal.sleep(600);
   Terminal.print("");
-  Terminal.print("tty1 login: ");
-  await Terminal.readLine({ prefix: "tty1 login: " });
-  await Terminal.readLine({ prefix: "Password: ", mask: "-" });
-  Terminal.print("Welcome to portfolio!");
-  await Terminal.sleep(300);
+  Terminal.print("Connected to network.");
   Terminal.print("");
   if (Shell.helpText) {
     Terminal.print("Available commands:");
@@ -153,8 +144,8 @@ async function main() {
   await waitForPowerOn();
   await runGrubSequence();
   await runBootSequence();
-  await runTtyLogin();
   while (true) {
+    await runLogin();
     await runShellLoop();
   }
 }
