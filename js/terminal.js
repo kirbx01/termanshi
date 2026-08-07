@@ -8,7 +8,7 @@ const Terminal = (() => {
   // `color <name>` (see commands.js) can switch to a fixed theme instead.
   const BG = "#000000";
   const IS_FIREFOX = /Firefox\//.test(navigator.userAgent || "");
-  const GLOW_BLUR = IS_FIREFOX ? 6 : 12;            // STATIC glow amount - never animated
+  const GLOW_BLUR = IS_FIREFOX ? 12 : 22;            // STATIC glow amount - never animated
 
   const THEMES = {
     rgb:    { mode: "rgb" },
@@ -16,7 +16,7 @@ const Terminal = (() => {
     red:    { mode: "static", color: "#ff4d4d" },
     green:  { mode: "static", color: "#39ff6a" },
     blue:   { mode: "static", color: "#4da6ff" },
-    amber:  { mode: "static", color: "#ffbf00" },
+    amber:  { mode: "static", color: "#ffdf00" },
     cyan:   { mode: "static", color: "#4dffef" },
     purple: { mode: "static", color: "#c17cff" },
     white:  { mode: "static", color: "#f2f2f2" },
