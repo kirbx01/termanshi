@@ -59,7 +59,7 @@ const Terminal = (() => {
 
   function getTheme() { return currentTheme; }
 
-  // ---- type metrics --------------------------------------------------
+  //type metrics
   const FONT_FAMILIES = {
     jetbrains: '"JetBrains Mono"',
     plex: '"IBM Plex Mono"',
@@ -85,13 +85,12 @@ const Terminal = (() => {
   }
 
   //state
-  let lines = [];              // committed scrollback (shell mode)
+  let lines = [];              
   const MAX_SCROLLBACK = 3000;
   let mode = "shell";          // "shell" | "nano" | "game"
-  let activeGame = null;       // { onKey(e) } while mode === "game"
+  let activeGame = null;      
 
-  let liveLine = null;         // { prefix, typed, cursor, mask } while reading input
-  let inputResolver = null;
+  let liveLine = null;         
   let inputReject = null;
   let currentHistory = null;
   let historyIndex = 0;
@@ -101,7 +100,7 @@ const Terminal = (() => {
   let blinkTimer = null;
 
   // nano mode state
-  let nano = null; // { filename, buffer(string), cursor(index), statusMsg }
+  let nano = null; 
 
   function applyFont() {
     ctx.font = `${FONT_WEIGHT} ${fontSize}px ${fontStackFor(currentFontKey)}`;
@@ -551,9 +550,7 @@ const Terminal = (() => {
     }
   }
 
-  // ---------------------------------------------------------------
   // nano mode
-  // ---------------------------------------------------------------
   function nanoEdit(filename, content) {
     return new Promise((resolve) => {
       mode = "nano";
@@ -575,7 +572,7 @@ const Terminal = (() => {
     }
     if (e.ctrlKey && (e.key === "o" || e.key === "O")) {
       e.preventDefault();
-      return; // save handled implicitly on exit for this simplified editor
+      return; 
     }
     if (e.key === "Backspace") {
       e.preventDefault();
@@ -883,7 +880,7 @@ const Terminal = (() => {
     // before we ever measure a character - otherwise measure() runs
     // against the generic "monospace" fallback and locks in the wrong
     // charWidth, which is what causes the cursor to drift off the text.
-    if (!document.fonts) return; // very old browser - nothing we can do, falls back gracefully
+    if (!document.fonts) return; 
     try {
       await Promise.all([
         document.fonts.load(`${FONT_WEIGHT} ${fontSize}px "JetBrains Mono"`),
@@ -891,8 +888,8 @@ const Terminal = (() => {
         document.fonts.load(`${FONT_WEIGHT} ${fontSize}px "Space Mono"`),
       ]);
       await document.fonts.ready;
-    } catch (e) {
-      // font loading failed for some reason - proceed with whatever is available
+    } catch (e) { // font loading failed for some reason - proceed with whatever is available
+      
     }
   }
 
