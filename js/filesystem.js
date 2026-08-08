@@ -1,5 +1,3 @@
-/*filesystem and the root*/
-
 const HOME_NAME = (window.PORTFOLIO_CONFIG && window.PORTFOLIO_CONFIG.homeDirName) || "panshi";
 
 function dir(children) {
@@ -14,9 +12,10 @@ const FS_ROOT = dir({
     [HOME_NAME]: dir({
       "Resume.pdf": file("Binary file - use `curl Resume.pdf` to download.", null),
 
-      //about
-
-      "about.txt": file(
+      
+//You can edit your details here and however you'd like to put your site
+//about
+"about.txt": file(
 `Priyanshi, 19F, Delhi, India
 Exploring Technologia :brokenheartemoji: 𓇢𓆸
 I AM A HUGE FAN OF REI AMI AND SANRIO AND OSAKA AND DIO BRANDO!!!!
@@ -31,9 +30,9 @@ Hardware:       PCB Design, KiCad, Signal Integrity, Debugging w/ scope+LA
 Graphics:       OpenGL, GLSL, Real-time rendering, Computational geometry
 Systems:        Linux, Bootloaders, Device Drivers, Memory-mapped I/O
 Tools:          Git, GDB, JTAG/SWD, Oscilloscope, Logic Analyzer`),
+      
 //contact
-
-      "contact.txt": file(
+"contact.txt": file(
 `Email:    priyanshiiroy@proton.me
   GitHub:   github.com/kirbyandluigixxcf
   LinkedIn: linkedin.com/in/priyanshiroy
@@ -41,8 +40,7 @@ Tools:          Git, GDB, JTAG/SWD, Oscilloscope, Logic Analyzer`),
 Feel free to reach out >///< `),
 
 //projects
-
-      projects: dir({
+ projects: dir({
         Neutron: file(
 `A lightweight embedded RTOS scheduler written in C for ARM Cortex-M
 targets. Focus on deterministic task switching and minimal footprint.
@@ -51,12 +49,13 @@ curl Neutron  ->  opens the GitHub repository`,
           "https://github.com/panshi/neutron"),
 
 
-        Discoring : file(
+Discoring : file(
 `Discoring
 A Discord music bot written in Rust with native audio playback, avoiding FFmpeg entirely. Built as a learning project focused on performance, simplicity, and low dependencies. Still a work in progress.
 curl Discoring  ->  opens the GitHub repository`,
           "https://github.com/kirbyandluigixxcf/discoring"),
       }),
+      
 //graphics
       graphics: dir({
         Artstation : file("Digital art & 3D work.\ncurl Artstation -> opens profile", "https://www.artstation.com/pansgotnocakes/"),
@@ -117,7 +116,7 @@ function fsPathString(parts) {
 }
 
 function fsDisplayPath(parts) {
-  //real linux imitation sort of thing here since ~ is officially (in arch,fedora)
+  //real linux imitation sort of thing here since ~follows the arch or fedoran distinguish
   const full = fsPathString(parts);
   const homePath = `/home/${HOME_NAME}`;
   if (full === homePath) return "~";
