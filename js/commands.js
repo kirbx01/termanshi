@@ -1,5 +1,3 @@
-//commands of this file globally
-
 const Shell = (() => {
   const config = window.PORTFOLIO_CONFIG || {};
   const defaultHome = config.homeDirName || "panshi";
@@ -342,84 +340,6 @@ const Shell = (() => {
     await Terminal.runMatrix();
     Terminal.print("Wake up, panshi...");
   }
-
-  // function cmd_ascii(args) {
-  //   const art = {
-  //     default: [
-  //       "      __   __      ",
-  //       "     /  `.'  \\     ",
-  //       "    |  ^  ^  |    ",
-  //       "    |   __   |    ",
-  //       "     \\ \\__/ /     ",
-  //       "      `.__.'      ",
-  //       "   ASCII art loaded.",
-  //     ],
-  //     robot: [
-  //       "      [::::]      ",
-  //       "     ( 0  0 )     ",
-  //       "     (  --  )     ",
-  //       "     /| AAA |\\    ",
-  //       "    /_|_____|_\\   ",
-  //       "   ASCII robot ready.",
-  //     ],
-  //     wave: [
-  //       " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ",
-  //       "    ~   ~      ~     ~~   ~       ",
-  //       " ~     ~~   ~    ~    ~~~   ~~~~   ",
-  //       "   ~~~    ~~~   ~     ~    ~      ",
-  //       "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ",
-  //       "   ASCII wave mode activated.",
-  //     ],
-  //   };
-  //   const key = (args[0] || "default").toLowerCase();
-  //   const output = art[key] || art.default;
-  //   output.forEach(line => Terminal.print(line));
-  // }
-
-  // async function cmd_ytvideo(args) {
-  //   const title = args.length ? args.join(" ") : "demo video";
-  //   Terminal.print(`Playing ascii video: ${title}`);
-  //   await Terminal.sleep(300);
-  //   const video = [
-  //     "┌─────────────────────────────┐",
-  //     "| [=========       ] 42%      |",
-  //     "|      ░▒▓█  LOADING  █▓▒░     |",
-  //     "|   ╔═══════════════════════╗  |",
-  //     "|   ║  ╔═╗ ╔═╗ ╦ ╦ ╔═╗  ╔╗ ╔═╗  ║  |",
-  //     "|   ║  ║ ║ ║ ║ ║ ╠═╣  ╠╩╗ ║ ╣  ║  |",
-  //     "|   ║  ╚═╝ ╚═╝ ╚═╝ ╩ ╩  ╚═╝ ╚═╝  ║  |",
-  //     "|   ╚═══════════════════════╝  |",
-  //     "|                             |",
-  //     "|   [Press Enter to close]    |",
-  //     "└─────────────────────────────┘",
-  //   ];
-  //   video.forEach(line => Terminal.print(line));
-  // }
-
-  // function cmd_weather(args) {
-  //   Terminal.print("Terminal Weather Report");
-  //   Terminal.print("----------------------");
-  //   Terminal.print("Location: portfolio city");
-  //   Terminal.print("Condition: clear skies");
-  //   Terminal.print("Temperature: 22°C");
-  //   Terminal.print("Humidity: 48%");
-  //   Terminal.print("Wind: 6 km/h NW");
-  //   Terminal.print("Forecast: stable, no rain.");
-  // }
-
-  // function cmd_ping(args) {
-  //   if (!args[0]) {
-  //     Terminal.print("usage: ping <host>");
-  //     return;
-  //   }
-  //   const host = args[0];
-  //   const times = ["24ms", "19ms", "23ms", "21ms", "20ms"];
-  //   Terminal.print(`PING ${host} (127.0.0.1): 56 data bytes`);
-  //   times.forEach(t => Terminal.print(`64 bytes from ${host}: icmp_seq=1 ttl=64 time=${t}`));
-  //   Terminal.print(`\n--- ${host} ping statistics ---`);
-  //   Terminal.print(`${times.length} packets transmitted, ${times.length} received, 0% packet loss`);
-  //   Terminal.print(`round-trip min/avg/max = ${times[1]}/${times.reduce((sum, v) => sum + parseInt(v, 10), 0) / times.length}ms/${times[2]}ms`);
-  // }
 
   async function cmd_tictactoe() {
     const result = await Terminal.runTicTacToe();

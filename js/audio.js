@@ -6,12 +6,12 @@ const TermAudio = (() => {
   let unlocked = false;
   let volumeMultiplier = 1;
 
-  //volume adjustment
+  //volume sizer
   function setVolume(level) {
     if (level < 0) level = 0;
     if (level > 1) level = 1; //max volume is 1.0
     volumeMultiplier = level;
-    if (humGain) { // Adjust hum if it's already playing
+    if (humGain) { 
       humGain.gain.value = 0.035 * volumeMultiplier;
     }
   }
@@ -44,7 +44,7 @@ const TermAudio = (() => {
     humOsc.start();
   }
 
-  // A short, quiet mechanical-ish click for regular keystrokes
+//keystroke sound
   function key() {
     if (!ctx) return;
     const t = ctx.currentTime;
@@ -60,7 +60,7 @@ const TermAudio = (() => {
     osc.stop(t + 0.04);
   }
 
-  // A slightly deeper, longer tone for Enter.
+// enter sound
   function enter() {
     if (!ctx) return;
     const t = ctx.currentTime;
@@ -77,7 +77,7 @@ const TermAudio = (() => {
     osc.stop(t + 0.1);
   }
 
-  // A soft low thud, used for backspace.
+  //backspace sound
   function tick() {
     if (!ctx) return;
     const t = ctx.currentTime;
