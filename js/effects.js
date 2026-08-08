@@ -23,8 +23,8 @@ const CRT = (() => {
     uniform sampler2D uTex;
     uniform float uTime;
     uniform vec2 uResolution;
-    uniform float uGlitch;      // 0..1 intensity of an active sync glitch
-    uniform float uGlitchSeed;  // per-glitch random seed
+    uniform float uGlitch;      
+    uniform float uGlitchSeed;  
 
     float computeDistortion(vec2 uv, vec2 cc) {
       float aspect = uResolution.x / max(uResolution.y, 1.0);
@@ -36,7 +36,6 @@ const CRT = (() => {
       return curve;
     }
 
-    // cheap hash-based pseudo-random
     float rand(vec2 co) {
       return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
     }
@@ -44,26 +43,21 @@ const CRT = (() => {
     void main() {
       vec2 uv = vUv;
 
-      // ---- responsive convex barrel distortion ----
       vec2 cc = uv * 2.0 - 1.0;
       cc *= computeDistortion(uv, cc);
       uv = cc * 0.5 + 0.5;
 
-      // ---- subtle vertical raster drift ----
       uv.y += sin(uTime * 0.35) * 0.0009;
 
-      // ---- horizontal VHS sync glitch (brief, occasional) ----
       float glitchBand = step(0.5, fract(sin((uv.y + uGlitchSeed) * 90.0) * 4000.0));
       float glitchShift = uGlitch * glitchBand * 0.02 * sin(uGlitchSeed * 50.0);
       uv.x += glitchShift;
 
-      // outside the curved glass -> pure black bezel
       if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
         gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
         return;
       }
 
-      // ---- RGB chromatic aberration ----
       float aberration = 0.0012 + uGlitch * 0.003;
       vec2 dir = normalize(cc + 0.0001);
       float r = texture2D(uTex, uv - dir * aberration).r;
@@ -71,31 +65,25 @@ const CRT = (() => {
       float b = texture2D(uTex, uv + dir * aberration).b;
       vec3 color = vec3(r, g, b);
 
-      // ---- scanlines ----
       float scan = 0.94 + 0.06 * sin(uv.y * uResolution.y * 3.14159 * 1.0);
       color *= scan;
 
-      // ---- phosphor mask / aperture grille ----
       float col = mod(gl_FragCoord.x, 3.0);
       float mask = 0.92;
       if (col < 1.0) mask = 1.0;
       color *= mix(0.90, 1.0, mask);
 
-      // ---- vignette ----
       float vig = smoothstep(1.15, 0.35, length(cc));
       color *= mix(0.55, 1.0, vig);
 
-      // ---- subtle animated noise ----
       float n = (rand(uv * uResolution.xy + uTime * 60.0) - 0.5) * 0.035;
       color += n;
 
-      // ---- brightness flicker ----
       float flicker = 1.0
         + 0.015 * sin(uTime * 8.0)
         + 0.01 * (rand(vec2(uTime * 0.5, 1.0)) - 0.5);
       color *= flicker;
 
-      // brief brightening pulse during a sync glitch
       color += vec3(uGlitch * glitchBand * 0.06);
 
       gl_FragColor = vec4(color, 1.0);
@@ -118,7 +106,6 @@ const CRT = (() => {
   gl.linkProgram(program);
   gl.useProgram(program);
 
-  // full-screen quad
   const quad = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
   const buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
@@ -145,7 +132,6 @@ const CRT = (() => {
   let startTime = performance.now();
   let lastFrameAt = 0;
 
-  // glitch scheduling: fires roughly every 10-20 seconds, per spec
   let nextGlitchAt = performance.now() + (10000 + Math.random() * 10000);
   let glitchActiveUntil = 0;
   let glitchSeed = 0;
@@ -176,9 +162,8 @@ const CRT = (() => {
 
     const t = (now - startTime) / 1000;
 
-    //glitchcrt
     if (now > nextGlitchAt && now > glitchActiveUntil) {
-      glitchActiveUntil = now + 120 + Math.random() * 160; // brief, ~120-280ms
+      glitchActiveUntil = now + 120 + Math.random() * 160; 
       glitchSeed = Math.random() * 100.0;
       nextGlitchAt = now + 10000 + Math.random() * 10000;
     }
