@@ -19,12 +19,9 @@ const FS_ROOT = dir({
       "about.txt": file(
 `Priyanshi, 19F, Delhi, India
 Exploring Technologia :brokenheartemoji: 𓇢𓆸
-I like to build things that are small, fast, and deterministic and larp larp larp larp larp larp larp larp 
-larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp 
-larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp 
-larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp 
-larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp larp  
-I also like to make them look nice while doing it, but it never looks so, well....`),
+I AM A HUGE FAN OF REI AMI AND SANRIO AND OSAKA AND DIO BRANDO!!!!
+I have some nice projects on ricing and discord bot (only one each) but if you check them out I'd love it <3.
+I like to make things, mostly electronics and software. I like to make them work, but I also like to make them look nice while doing it, but it never looks so, well....`),  
 
 //skills
       "skills.txt": file(
