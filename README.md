@@ -1,5 +1,6 @@
 ﻿# Termanshi
-[![Deploy static content to Pages](https://github.com/kirbx01/termanshi/actions/workflows/static.yml/badge.svg)](https://github.com/kirbx01/termanshi/actions/workflows/static.yml)
+
+![Image](demo.png)
 
 I named it because it sounds nice and it's static and it's idk very fashionable and bare-metal; i love hello kitty and rei ami so there are like easters too if that helps. 
 
