@@ -62,9 +62,16 @@ function updatePowerButton() {
 
 async function runGrubSequence() {
   Terminal.clear();
-  for (const line of GRUB_LINES) {
-    Terminal.print(line);
-    await Terminal.sleep(140);
+  const targetRows = Terminal.rows || 24;
+  let printed = 0;
+  // Keep printing GRUB lines (cycling the array) until the screen is filled
+  while (printed < targetRows) {
+    for (const line of GRUB_LINES) {
+      Terminal.print(line);
+      printed++;
+      await Terminal.sleep(140);
+      if (printed >= targetRows) break;
+    }
   }
   await Terminal.sleep(300);
 }
@@ -80,10 +87,8 @@ async function runBootSequence() {
 
 async function runLogin() {
   Terminal.clear();
-  await Terminal.readLine({ prefix: "login: " });
-  await Terminal.readLine({ prefix: "Password: ", mask: "-" });
-  Terminal.print("Authenticating...");
-  await Terminal.sleep(650);
+  Terminal.print("Logging in...");
+  await Terminal.sleep(700);
   Terminal.print("Access granted.");
   await Terminal.sleep(350);
   const config = window.PORTFOLIO_CONFIG || {};
@@ -129,13 +134,12 @@ function handlePowerClick() {
 }
 
 function waitForPowerOn() {
+  // Auto power on immediately (no manual power button required)
   return new Promise((resolve) => {
-    powerResolve = resolve;
+    powerOn = true;
     powerButton = document.getElementById("power-button");
-    if (powerButton) {
-      powerButton.addEventListener("click", handlePowerClick);
-      updatePowerButton();
-    }
+    updatePowerButton();
+    resolve();
   });
 }
 
