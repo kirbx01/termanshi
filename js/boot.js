@@ -1,5 +1,3 @@
-/* on browser load */
-
 const GRUB_LINES = [
   "GNU GRUB 2.06",
   "Minimal BASH-like line editing is supported. For the first word, TAB lists possible command completions.",
@@ -64,7 +62,6 @@ async function runGrubSequence() {
   Terminal.clear();
   const targetRows = Terminal.rows || 24;
   let printed = 0;
-  // Keep printing GRUB lines (cycling the array) until the screen is filled
   while (printed < targetRows) {
     for (const line of GRUB_LINES) {
       Terminal.print(line);
@@ -134,7 +131,6 @@ function handlePowerClick() {
 }
 
 function waitForPowerOn() {
-  // Auto power on immediately (no manual power button required)
   return new Promise((resolve) => {
     powerOn = true;
     powerButton = document.getElementById("power-button");
