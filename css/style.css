@@ -75,6 +75,24 @@ html, body {
   display: block;
 }
 
+#mobile-swipe-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  font-size: 0.82rem;
+  line-height: 1.3;
+  padding: 8px 14px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  opacity: 0.88;
+  pointer-events: none;
+  z-index: 15;
+  display: none;
+}
+
 canvas {
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
@@ -88,10 +106,16 @@ canvas {
 
 #hidden-input {
   position: fixed;
-  left: -9999px;
-  top: -9999px;
+  left: 8px;
+  bottom: 8px;
   opacity: 0;
-  pointer-events: none;
   width: 1px;
   height: 1px;
+  pointer-events: auto;
+}
+
+@media (max-width: 900px) {
+  #mobile-swipe-hint {
+    display: block;
+  }
 }

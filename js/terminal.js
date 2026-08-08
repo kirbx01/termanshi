@@ -769,11 +769,55 @@ const Terminal = (() => {
   }
 
   const hiddenInput = document.getElementById("hidden-input");
+  const screenElement = document.getElementById("screen");
+  const swipeHint = document.getElementById("mobile-swipe-hint");
+  let touchStartY = 0;
+  let touchStartX = 0;
+  let touchActive = false;
+  const SWIPE_THRESHOLD = 60;
+  const MAX_SWIPE_X = 60;
 
   function focusHiddenInput() {
     if (hiddenInput) {
       hiddenInput.focus({ preventScroll: true });
     }
+  }
+
+  function showSwipeHint() {
+    if (!swipeHint) return;
+    swipeHint.classList.add("visible");
+    window.clearTimeout(swipeHint._hintTimeout);
+    swipeHint._hintTimeout = window.setTimeout(() => {
+      swipeHint.classList.remove("visible");
+    }, 2400);
+  }
+
+  function handleTouchStart(event) {
+    if (!event.touches || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    touchActive = true;
+  }
+
+  function handleTouchMove(event) {
+    if (!touchActive || !event.touches || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    if (Math.abs(touch.clientX - touchStartX) > MAX_SWIPE_X) {
+      touchActive = false;
+    }
+  }
+
+  function handleTouchEnd(event) {
+    if (!touchActive) return;
+    const touch = event.changedTouches ? event.changedTouches[0] : null;
+    if (!touch) return;
+    const deltaY = touchStartY - touch.clientY;
+    if (deltaY >= SWIPE_THRESHOLD) {
+      focusHiddenInput();
+      showSwipeHint();
+    }
+    touchActive = false;
   }
 
   hiddenInput?.addEventListener("input", () => {
@@ -874,6 +918,9 @@ const Terminal = (() => {
     if (event.target instanceof HTMLElement && event.target.closest("button, input")) return;
     focusHiddenInput();
   });
+  window.addEventListener("touchstart", handleTouchStart, { passive: true });
+  window.addEventListener("touchmove", handleTouchMove, { passive: true });
+  window.addEventListener("touchend", handleTouchEnd, { passive: true });
 
   async function loadFonts() {
     // Force the exact family/weight/size combo we render with to load
