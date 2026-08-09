@@ -34,26 +34,33 @@ Tools:          Git, GDB, JTAG/SWD, Oscilloscope, Logic Analyzer`),
 //contact
 "contact.txt": file(
 `Email:    priyanshiiroy@proton.me
-  GitHub:   github.com/kirbx01
-  LinkedIn: linkedin.com/in/priyanshiroy
+  GitHub:   https://github.com/kirbx01
+  LinkedIn: https://linkedin.com/in/priyanshiroy
 
 Feel free to reach out >///< `),
 
 //projects
- projects: dir({
-        Neutron: file(
-`A lightweight embedded RTOS scheduler written in C for ARM Cortex-M
-targets. Focus on deterministic task switching and minimal footprint.
+      projects: dir({
+        Termanshi: file(
+` What youre seeing right now. 
 
-curl Neutron  ->  opens the GitHub repository`,
-          "https://github.com/panshi/neutron"),
+curl Termanshi  ->  opens the GitHub repository`,
+          "https://github.com/kirbx01/termanshi"),
 
-
-Discoring : file(
+        Discoring: file(
 `Discoring
 A Discord music bot written in Rust with native audio playback, avoiding FFmpeg entirely. Built as a learning project focused on performance, simplicity, and low dependencies. Still a work in progress.
 curl Discoring  ->  opens the GitHub repository`,
           "https://github.com/kirbyandluigixxcf/discoring"),
+
+        Port0000: file(
+`Port0000
+A terminal chat app made through go where you can message others through the TCP/IP also uses rfcomm for bluetooth.
+
+Resources
+
+curl Port0000  ->  opens the GitHub repository`,
+          "https://github.com/kirbx01/Port0000"),
       }),
       
 //graphics
@@ -67,7 +74,7 @@ curl Discoring  ->  opens the GitHub repository`,
       }),
 //socials
       socials: dir({
-        GitHub: file("Code & firmware repos.\ncurl GitHub -> opens profile", "https://github.com/kirbyandluigixxcf"),
+        GitHub: file("Code & firmware repos.\ncurl GitHub -> opens profile", "https://github.com/kirbx01"),
       }),
     }),
   }),
