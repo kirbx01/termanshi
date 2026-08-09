@@ -34,7 +34,7 @@ Tools:          Git, GDB, JTAG/SWD, Oscilloscope, Logic Analyzer`),
 //contact
 "contact.txt": file(
 `Email:    priyanshiiroy@proton.me
-  GitHub:   github.com/kirbyandluigixxcf
+  GitHub:   github.com/kirbx01
   LinkedIn: linkedin.com/in/priyanshiroy
 
 Feel free to reach out >///< `),
@@ -63,14 +63,11 @@ curl Discoring  ->  opens the GitHub repository`,
       }),
 //media (music,video streaming)
       media: dir({
-        YouTube: file("Project walkthroughs & builds.\ncurl YouTube -> opens channel", "https://www.youtube.com/@panshi"),
         Spotify: file("What I listen to while soldering.\ncurl Spotify -> opens profile", "https://open.spotify.com/user/615hglvwo1oe64zlk8matve1b?si=7284840f2b5c4fb5"),
       }),
 //socials
       socials: dir({
         GitHub: file("Code & firmware repos.\ncurl GitHub -> opens profile", "https://github.com/kirbyandluigixxcf"),
-        LinkedIn: file("Professional profile.\ncurl LinkedIn -> opens profile", "https://www.linkedin.com/in/priyanshiroy/"),
-        Twitter: file("Short-form updates.\ncurl Twitter -> opens profile", "https://twitter.com/phiandrho"),
       }),
     }),
   }),

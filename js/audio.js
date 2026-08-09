@@ -1,12 +1,11 @@
-
 const TermAudio = (() => {
   let ctx = null;
   let humOsc = null;
   let humGain = null;
   let unlocked = false;
   let volumeMultiplier = 1;
-
-  //volume sizer
+  
+  
   function setVolume(level) {
     if (level < 0) level = 0;
     if (level > 1) level = 1; //max volume is 1.0
@@ -44,7 +43,6 @@ const TermAudio = (() => {
     humOsc.start();
   }
 
-//keystroke sound
   function key() {
     if (!ctx) return;
     const t = ctx.currentTime;
@@ -60,7 +58,6 @@ const TermAudio = (() => {
     osc.stop(t + 0.04);
   }
 
-// enter sound
   function enter() {
     if (!ctx) return;
     const t = ctx.currentTime;
@@ -77,7 +74,6 @@ const TermAudio = (() => {
     osc.stop(t + 0.1);
   }
 
-  //backspace sound
   function tick() {
     if (!ctx) return;
     const t = ctx.currentTime;
@@ -99,3 +95,4 @@ const TermAudio = (() => {
 
   return { unlock, key, enter, tick, setVolume, getVolume };
 })();
+

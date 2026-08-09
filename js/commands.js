@@ -270,6 +270,7 @@ const Shell = (() => {
   //   setfont <18>       set an exact pixel size
   //   setfont <family>   jetbrains | plex | space
   //   setfont reset      restore defaults
+  // for updations if anyone want to check how the thing works
 
   function cmd_setfont(args) {
     const families = Object.keys(Terminal.FONT_FAMILIES).join(", ");
@@ -335,7 +336,7 @@ const Shell = (() => {
   }
 
   
-  // fun commands (matrix, snake rn)
+  // fun commands (matrix, snake rn : bout to add some terminal games and go proj as apart of it)
    async function cmd_matrix() {
     await Terminal.runMatrix();
     Terminal.print("Wake up, panshi...");
@@ -355,10 +356,11 @@ const Shell = (() => {
   async function cmd_exit() {
     Terminal.print("logout");
     await Terminal.sleep(400);
-    return "LOGOUT"; // signal boot.js to return to the login screen
+    return "LOGOUT"; 
   }
 
 //neofetch and start
+//keep in mind to use online ascii code embeds if you want to involve yours here
   const BOOT_TIME = Date.now();
 
   const ASCII_LOGO = [
@@ -379,17 +381,14 @@ const Shell = (() => {
   ];
 
   const ASCII_LOGO_NARROW = [
-    "  .--.   .--.",
-    " (    )_(    )",
-    "  \"--`  `--\"",
+    "𓆏𓆏𓆏𓆏𓆏𓆏𓆏𓆏𓆏𓆏",
     "  panshiOS",
   ];
 
   const ASCII_LOGO_COMPACT = [
-    "  /\\_/\\",
-    " ( o.o )",
-    "  > ^ <",
+"𓆏𓆏𓆏𓆏",
   ];
+
 
   function getAsciiLogo() {
     const width = window.innerWidth || screen.width || 0;
@@ -454,7 +453,6 @@ const Shell = (() => {
         storageLine = `${usedGB} GiB / ${quotaGB} GiB (${pct}%)`;
       }
     } catch (e) {
-      /* leave as unavailable */
     }
 
     const projects = countChildren(["home", defaultHome, "projects"]);

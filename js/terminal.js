@@ -3,12 +3,9 @@ const Terminal = (() => {
   const canvas = document.getElementById("text-canvas");
   const ctx = canvas.getContext("2d", { alpha: false });
 
-  
-  // Default scheme is an animated RGB cycle (gaming-style hue shift).
-  // `color <name>` (see commands.js) can switch to a fixed theme instead.
   const BG = "#000000";
   const IS_FIREFOX = /Firefox\//.test(navigator.userAgent || "");
-  const GLOW_BLUR = IS_FIREFOX ? 16 : 28;            // STATIC glow amount - never animated
+  const GLOW_BLUR = IS_FIREFOX ? 16 : 28;        
 
   const THEMES = {
     rgb:    { mode: "rgb" },
@@ -25,8 +22,6 @@ const Terminal = (() => {
   let currentTheme = "amber";
   let rgbAnimTimer = null;
 
-  // eight evenly-spread hues used to colourise the neofetch dots
-  // individually, independent of whichever theme is active.
   const DOT_HUES = [0, 40, 80, 130, 175, 210, 260, 305];
 
   function hslColor(hueOffset = 0, sat = 100, light = 68) {
@@ -59,7 +54,6 @@ const Terminal = (() => {
 
   function getTheme() { return currentTheme; }
 
-  //type metrics
   const FONT_FAMILIES = {
     jetbrains: '"JetBrains Mono"',
     plex: '"IBM Plex Mono"',
@@ -84,10 +78,9 @@ const Terminal = (() => {
     return `${primary}, "JetBrains Mono", "IBM Plex Mono", "Space Mono", monospace`;
   }
 
-  //state
   let lines = [];              
   const MAX_SCROLLBACK = 3000;
-  let mode = "shell";          // "shell" | "nano" | "game"
+  let mode = "shell";          
   let activeGame = null;      
 
   let liveLine = null;         
@@ -99,7 +92,6 @@ const Terminal = (() => {
   let cursorVisible = true;
   let blinkTimer = null;
 
-  // nano mode state
   let nano = null; 
 
   function applyFont() {
@@ -171,10 +163,6 @@ const Terminal = (() => {
     render();
   }
 
-  // `content` is either a plain string (rendered in the current theme
-  // color) or an array of rich segments: [{ text, color? , hue? }].
-  // `hue` (a 0-360 offset) renders an animated/static HSL color, used
-  // to colourise the neofetch dots individually. `color` is a fixed hex.
   function wrapText(content, limit) {
     const text = String(content || "");
     if (!limit || limit <= 0) return [""];
@@ -279,12 +267,9 @@ const Terminal = (() => {
     }
 
     if (mode === "game") {
-      // matrix/snake draw themselves directly via their own loops;
-      // nothing to composite here.
       return;
     }
 
-    // shell mode: scrollback + optional live input line
     const displayLines = lines.slice();
     if (liveLine) {
       const shown = liveLine.mask
@@ -312,7 +297,6 @@ const Terminal = (() => {
     drawTextRow(header, 0);
 
     const bodyRows = rows - 2;
-    // find cursor line/col
     let idx = 0, curLine = 0, curCol = 0;
     for (let i = 0; i < bufLines.length; i++) {
       const len = bufLines[i].length;
@@ -334,7 +318,6 @@ const Terminal = (() => {
     drawTextRow(footer, rows - 1);
   }
 
-//cursor
   function startBlink() {
     if (blinkTimer) return;
     blinkTimer = setInterval(() => {
@@ -353,7 +336,6 @@ const Terminal = (() => {
     render();
   }
 
-  // pushes a rich (multi-color) line: array of { text, color?, hue? }
   function printRich(segments) {
     lines.push(segments);
     if (lines.length > MAX_SCROLLBACK) lines = lines.slice(-MAX_SCROLLBACK);
@@ -383,7 +365,6 @@ const Terminal = (() => {
     return new Promise(res => setTimeout(res, ms));
   }
 
-  // typed line effect used during boot
   async function typeLine(text, speed = 24) {
     lines.push("");
     const rowLineIdx = lines.length - 1;
@@ -401,7 +382,6 @@ const Terminal = (() => {
     }
   }
 
-//input handling 
   function readLine({ prefix = "", mask = null, history = null, onTab = null } = {}) {
     return new Promise((resolve, reject) => {
       liveLine = { prefix, typed: "", cursor: 0, mask };
@@ -550,7 +530,6 @@ const Terminal = (() => {
     }
   }
 
-  // nano mode
   function nanoEdit(filename, content) {
     return new Promise((resolve) => {
       mode = "nano";
@@ -612,9 +591,6 @@ const Terminal = (() => {
     }
   }
 
-  // fun commands: matrix rain + tic-tac-toe
-  // both take over the canvas directly (like nano mode) and hand
-  // control back to the shell once the visitor exits.
   function runMatrix() {
     return new Promise((resolve) => {
       mode = "game";
@@ -923,10 +899,6 @@ const Terminal = (() => {
   window.addEventListener("touchend", handleTouchEnd, { passive: true });
 
   async function loadFonts() {
-    // Force the exact family/weight/size combo we render with to load
-    // before we ever measure a character - otherwise measure() runs
-    // against the generic "monospace" fallback and locks in the wrong
-    // charWidth, which is what causes the cursor to drift off the text.
     if (!document.fonts) return; 
     try {
       await Promise.all([
@@ -935,8 +907,7 @@ const Terminal = (() => {
         document.fonts.load(`${FONT_WEIGHT} ${fontSize}px "Space Mono"`),
       ]);
       await document.fonts.ready;
-    } catch (e) { // font loading failed for some reason - proceed with whatever is available
-      
+    } catch (e) {       
     }
   }
 
