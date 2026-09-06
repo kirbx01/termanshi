@@ -1,4 +1,8 @@
 ﻿# Termanshi
+>[!NOTE]
+>This lags HEAVILY on firefox and firefox based browsers due to the heavier webgl components so be careful about it pls.
+>Also the phone ui is a lil broken due to lack of creative assets that couldve been possibly injected but complicated asciis are vry not cx friendly hence the work has not been put through yet and will be done wen i reupdate it.
+
 
 ![Image](demo.png)
 
