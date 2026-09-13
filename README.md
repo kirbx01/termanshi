@@ -5,6 +5,9 @@
 
 
 ![Image](demo.png)
+![This is what happens on formatting](format.png)
+![This is just blog page i dont write blogs as of now but i really will resume](blog.png)
+![Keyword Similarity DEMO](keyword-fuzz.png)
 
 ## What it is
 Well clearly a portfolio website. 
