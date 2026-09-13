@@ -411,6 +411,7 @@ const Terminal = (() => {
   }
 
   function render() {
+    resetClickRegions();
     ctx.save();
     ctx.shadowBlur = 0;
     ctx.fillStyle = BG;
@@ -450,7 +451,6 @@ const Terminal = (() => {
     const visible = displayLines.slice(-rows);
     const startRow = 0;
     let sugRowIndex = -1;
-    resetClickRegions();
     if (sugIndex !== -1) sugRowIndex = sugIndex - (displayLines.length - visible.length);
     for (let i = 0; i < visible.length; i++) {
       if (suggestions && i === sugRowIndex) {
@@ -529,6 +529,10 @@ const Terminal = (() => {
   function startBlink() {
     if (blinkTimer) return;
     blinkTimer = setInterval(() => {
+      if (mode === "nano") {
+        cursorVisible = true;
+        return;
+      }
       cursorVisible = !cursorVisible;
       catCursorFrameIndex = (catCursorFrameIndex + 1) % CAT_CURSOR_FRAMES.length;
       render();
@@ -568,6 +572,7 @@ const Terminal = (() => {
   }
 
   function runClickAction(clientX, clientY) {
+    if (mode !== "shell") return false;
     if (!terminalPane) return false;
     const rect = terminalPane.getBoundingClientRect();
     const dx = clientX - rect.left;

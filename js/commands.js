@@ -136,12 +136,12 @@ const Shell = (() => {
       Terminal.print("No blogs yet - add entries in js/filesystem.js.");
       return;
     }
-    Terminal.print(`${names.length} blog post${names.length === 1 ? "" : "s"} (click to open)`);
+    Terminal.print(`${names.length} blog post${names.length === 1 ? "" : "s"} (click to read)`);
     for (const n of names) {
       const child = blogsNode.children[n];
       const path = fsPathString(["home", defaultHome, "blogs", n]);
       if (child.url) {
-        Terminal.printClickable({ label: n.replace(/\.txt$/i, ""), cmd: `curl ${path}`, hint: "open" });
+        Terminal.printClickable({ label: n.replace(/\.txt$/i, ""), cmd: `cat ${path}`, hint: "read" });
       } else {
         Terminal.printClickable({ label: n, cmd: `cat ${path}`, hint: "view" });
       }
