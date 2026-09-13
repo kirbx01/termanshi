@@ -80,6 +80,7 @@ curl Port0000  ->  opens the GitHub repository`,
 //Update the title (the key before the colon), the text content, and the
 //url (second arg of file()) and the Blogs menu will pick them up +
 //clicking one in the terminal opens the url in a new tab.
+//To edit a post (or write a new one) type `sm` in the terminal.
       blogs: dir({
         "blog-1-hasi-mazak": file(
 `Blog #1 - Hello soldering world

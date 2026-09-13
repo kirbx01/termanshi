@@ -180,14 +180,13 @@ canvas {
   pointer-events: auto;
 }
 
-/* ---- Screen 1: login card ---- */
+/* ---- Screen 1: TUI dialog login ---- */
 #login-screen {
   position: fixed;
   inset: 0;
   z-index: 40;
   display: block;
-  background: radial-gradient(circle at 50% 4%, rgba(255, 170, 0, 0.06), transparent 20%),
-              linear-gradient(180deg, #050505 0%, #121212 100%);
+  background: #ffaa00;
   opacity: 1;
   visibility: visible;
   transition: opacity 0.45s ease, visibility 0.45s ease;
@@ -217,36 +216,42 @@ canvas {
 }
 
 #login-card {
-  container-type: inline-size;
   width: 100%;
-  max-width: 480px;
+  max-width: 460px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 22px 24px 24px;
-  background: rgba(10, 10, 10, 0.92);
-  border: 1px solid var(--term-accent-dim);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 70px rgba(255, 170, 0, 0.15);
+  background: #0a0a0a;
+  border: 3px solid #000000;
+  box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.5), 4px 4px 0 0 rgba(0, 0, 0, 0.25);
+  font-family: var(--term-mono);
+  color: #ffaa00;
+}
+
+.login-titlebar {
+  padding: 8px 14px;
+  background: #ffaa00;
+  color: #000000;
+  font-family: var(--term-mono);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.34em;
+  text-align: center;
+  border-bottom: 3px solid #000000;
+}
+
+.login-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 22px 22px;
 }
 
 #login-banner {
-  margin: 0 0 6px;
-  overflow: hidden;
+  margin: 0 0 4px;
   font-family: var(--term-mono);
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: pre;
-  font-size: clamp(8px, 1.9vw, 12px);
-  background: linear-gradient(180deg, var(--term-accent) 0%, #ffaa00 62%, #ffaa00 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-@supports (container-type: inline-size) {
-  #login-banner {
-    font-size: calc(2.7cqi);
-  }
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #ffaa00;
 }
 
 .login-field {
@@ -256,25 +261,27 @@ canvas {
 }
 
 .login-label-text {
-  font-family: var(--term-header);
+  font-family: var(--term-mono);
   font-weight: 400;
-  font-size: 0.9rem;
-  letter-spacing: 0.18em;
-  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.82rem;
+  letter-spacing: 0.26em;
+  color: #ffaa00;
 }
 
 #login-card input {
-  min-height: 46px;
-  height: 46px;
-  padding: 0 12px;
+  min-height: 40px;
+  height: 40px;
+  padding: 0 8px;
   font-family: var(--term-mono);
   font-size: 1rem;
   font-weight: 400;
-  letter-spacing: 0.08em;
-  color: var(--term-fg);
-  background: #0d0d0d;
-  border: 1px solid rgba(255, 170, 0, 0.35);
-  border-radius: 2px;
+  letter-spacing: 0.1em;
+  color: #ffaa00;
+  caret-color: #ffaa00;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid rgba(255, 170, 0, 0.7);
+  border-radius: 0;
   user-select: text;
   -webkit-user-select: text;
   -webkit-appearance: none;
@@ -282,42 +289,48 @@ canvas {
 }
 
 #login-card input:focus {
-  border-color: var(--term-accent);
-  box-shadow: 0 0 0 1px rgba(255, 170, 0, 0.35);
-  background: #101010;
+  outline: none;
+  border-bottom-color: #ffaa00;
+  background: rgba(255, 170, 0, 0.08);
 }
 
 #login-card input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 170, 0, 0.35);
 }
 
 #login-hint {
-  margin: -6px 0 0;
+  margin: -2px 0 0;
   font-family: var(--term-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.38);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 170, 0, 0.55);
 }
 
 #login-submit {
   appearance: none;
   -webkit-appearance: none;
-  min-height: 46px;
-  height: 46px;
+  align-self: center;
+  min-width: 170px;
+  height: 44px;
+  margin-top: 2px;
   font-family: var(--term-mono);
-  font-weight: 400;
-  font-size: 0.85rem;
-  letter-spacing: 0.24em;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.3em;
   color: #000000;
-  background: var(--term-accent);
-  border: 1px solid var(--term-accent);
-  border-radius: 2px;
+  background: #ffaa00;
+  border: 2px solid #000000;
+  border-radius: 0;
   cursor: url("../js/assets/cat01.ani") 16 16, url("../js/assets/cat01.cur") 16 16, pointer;
+}
+
+#login-submit:hover {
+  background: #ffb31a;
 }
 
 #login-submit:active {
   background: #ffaa00;
-  transform: translateY(1px);
+  transform: translate(1px, 1px);
   cursor: url("../js/assets/cat02.ani") 16 16, url("../js/assets/cat02.cur") 16 16, pointer;
 }
 

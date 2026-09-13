@@ -44,6 +44,7 @@ const Shell = (() => {
   neofetch          show system summary
   curl <target>     fetch / open a resource
   nano <file>       edit a file
+  sm [post]         edit your blogs with GNU nano (^X exit, ^O write out)
   sudo <cmd>        try to elevate privileges
   reboot            restart the system
   exit              log out
@@ -272,10 +273,79 @@ const Shell = (() => {
       Terminal.print(`nano: cannot create '${args[0]}'`);
       return;
     }
-    const result = await Terminal.nanoEdit(args[0], content || "");
-    if (parent && parent.type === "dir") {
-      parent.children[name] = file(result);
+    const save = (buf) => {
+      if (parent && parent.type === "dir") {
+        const prev = parent.children[name];
+        parent.children[name] = file(buf, prev && prev.type === "file" ? prev.url : null);
+      }
+    };
+    const result = await Terminal.nanoEdit(args[0], content || "", save);
+    save(result);
+  }
+
+  async function cmd_sm(args) {
+    const blogsNode = fsGetNode(["home", defaultHome, "blogs"]);
+    if (!blogsNode || blogsNode.type !== "dir") {
+      Terminal.print("sm: no blogs directory found.");
+      return;
     }
+    const existing = Object.keys(blogsNode.children);
+    const NEW = "__NEW__";
+    const pick = (raw) => {
+      const t = String(raw || "").trim();
+      if (!t) return null;
+      if (/^\d+$/.test(t)) return existing[Number(t) - 1] || null;
+      if (t === "new" || t === "n") return NEW;
+      return existing.includes(t) ? t : null;
+    };
+    const ask = async (prefix) => {
+      try {
+        return await Terminal.readLine({ prefix });
+      } catch (e) {
+        Terminal.print("^C");
+        return null;
+      }
+    };
+
+    let target = args[0] ? pick(args[0]) : null;
+    if (args[0] && !target) {
+      Terminal.print(`sm: unknown blog '${args[0]}'`);
+      return;
+    }
+    if (!target) {
+      Terminal.print(existing.length
+        ? "Your blog posts (pick a number, or type 'new'):"
+        : "No blogs yet - let's write your first one.");
+      existing.forEach((n, i) => Terminal.print(`  ${i + 1})  ${n}`));
+      Terminal.print("");
+      while (!target) {
+        const raw = await ask("Edit which one? ");
+        target = pick(raw);
+        if (!target) Terminal.print("sm: try a number, a name, or 'new'");
+      }
+    }
+
+    let filename = target;
+    if (target === NEW) {
+      const raw = await ask("New post title: ");
+      filename = String(raw || "").trim().replace(/\s+/g, "-");
+      if (!filename) { Terminal.print("sm: aborted"); return; }
+    }
+
+    const parts = fsResolve(["home", defaultHome, "blogs"], filename);
+    const { parent, name } = getParent(parts);
+    if (!parent || parent.type !== "dir") {
+      Terminal.print(`sm: cannot create '${filename}'`);
+      return;
+    }
+    const node = fsGetNode(parts);
+    const content = node && node.type === "file" ? node.content : "";
+
+    const save = (buf) => { parent.children[name] = file(buf); };
+    const result = await Terminal.nanoEdit(name, content || "", save);
+    save(result);
+
+    Terminal.print(`Blog '${name}' saved to ${fsPathString(["home", defaultHome, "blogs", name])}`);
   }
 
   function cmd_sudo(args) {
@@ -585,6 +655,7 @@ const Shell = (() => {
     start: () => cmd_start(),
     curl: cmd_curl,
     nano: cmd_nano,
+    sm: cmd_sm,
     sudo: () => cmd_sudo(),
     color: cmd_color,
     setfont: cmd_setfont,

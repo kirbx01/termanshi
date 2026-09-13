@@ -13,32 +13,26 @@
 </head>
 <body>
 
-  <!-- Screen 1: themed login card. Not real authentication - any non-empty
+  <!-- Screen 1: TUI-style dialog login. Not real authentication - any non-empty
        LOGIN + PWD transition into the terminal. -->
   <div id="login-screen">
     <div class="login-scroll">
       <form id="login-card" novalidate>
         <h1 class="visually-hidden">PANSHI PORTFOLIO</h1>
-        <pre id="login-banner" aria-hidden="true"> ____   _    _   _ ____  _   _ ___ 
-|  _ \ / \  | \ | / ___|| | | |_ _|
-| |_) / _ \ |  \| \___ \| |_| || | 
-|  __/ ___ \| |\  |___) |  _  || | 
-|_| /_/   \_\_| \_|____/|_| |_|___|
- ____   ___  ____ _____ _____ ___  _     ___ ___  
-|  _ \ / _ \|  _ \_   _|  ___/ _ \| |   |_ _/ _ \ 
-| |_) | | | | |_) || | | |_ | | | | |    | | | | |
-|  __/| |_| |  _ < | | |  _|| |_| | |___ | | |_| |
-|_|    \___/|_| \_\|_| |_|   \___/|_____|___\___/</pre>
-        <label class="login-field">
-          <span class="login-label-text">LOGIN</span>
-          <input id="login-user" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="LOGIN" />
-        </label>
-        <label class="login-field">
-          <span class="login-label-text">PWD</span>
-          <input id="login-pwd" type="password" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="PWD" enterkeyhint="go" />
-        </label>
-        <p id="login-hint">type anything to continue</p>
-        <button id="login-submit" type="submit">LOGIN</button>
+        <div class="login-titlebar">LOGIN</div>
+        <div class="login-body">
+          <p id="login-banner">Welcome back, viewer.<br>Authenticate to enter the terminal.</p>
+          <label class="login-field">
+            <span class="login-label-text">LOGIN</span>
+            <input id="login-user" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="LOGIN" />
+          </label>
+          <label class="login-field">
+            <span class="login-label-text">PWD</span>
+            <input id="login-pwd" type="password" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="PWD" enterkeyhint="go" />
+          </label>
+          <p id="login-hint">type anything to continue</p>
+          <button id="login-submit" type="submit">[ LOGIN ]</button>
+        </div>
       </form>
     </div>
   </div>

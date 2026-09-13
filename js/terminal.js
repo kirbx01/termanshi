@@ -468,11 +468,22 @@ const Terminal = (() => {
   }
 
   function renderNano() {
-    const bufLines = nano.buffer.split("\n");
-    const header = ` GNU nano   ${nano.filename}`;
-    drawTextRow(header, 0);
+    const NANO_BG = "#ffaa00";
+    const NANO_INK = "#1f1200";
 
-    const bodyRows = rows - 2;
+    ctx.save();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = NANO_BG;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+    applyFont();
+    ctx.shadowColor = "#000000";
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = NANO_INK;
+
+    const bufLines = nano.buffer.split("\n");
+    const fname = String(nano.filename);
+
     let idx = 0, curLine = 0, curCol = 0;
     for (let i = 0; i < bufLines.length; i++) {
       const len = bufLines[i].length;
@@ -483,15 +494,36 @@ const Terminal = (() => {
       }
       idx += len + 1;
     }
-    let scrollTop = Math.max(0, curLine - bodyRows + 1);
-    const visible = bufLines.slice(scrollTop, scrollTop + bodyRows);
-    for (let i = 0; i < visible.length; i++) {
-      drawTextRow(visible[i], 1 + i);
-    }
-    drawCursorBlock(visible[curLine - scrollTop] || "", curCol, 1 + (curLine - scrollTop));
 
-    const footer = " ^X Exit    ^O Save    (read-only preview editor)";
-    drawTextRow(footer, rows - 1);
+    const bodyRows = rows - 2;
+    const scrollTop = Math.max(0, curLine - bodyRows + 1);
+    const visible = bufLines.slice(scrollTop, scrollTop + bodyRows);
+
+    function drawText(str, rowIndex, x) {
+      const y = Math.round(padTop + rowIndex * lineHeight + fontMetrics.ascent + 2);
+      ctx.fillText(String(str), x === undefined ? Math.round(padLeft) : Math.round(x), y);
+    }
+
+    drawText("GNU nano", 0);
+    const fnameW = ctx.measureText(fname).width;
+    drawText(fname, 0, (canvas.width / dpr - fnameW) / 2);
+    for (let i = 0; i < visible.length; i++) drawText(visible[i], 1 + i);
+
+    const curText = visible[curLine - scrollTop] || "";
+    const safeCol = Math.max(0, Math.min(curText.length, curCol));
+    const cx = Math.round(padLeft + ctx.measureText(curText.slice(0, safeCol)).width);
+    const cursorHeight = Math.max(2, Math.round(lineHeight - 4));
+    const rowBase = padTop + (1 + (curLine - scrollTop)) * lineHeight;
+    const cursorY = Math.round(rowBase + (lineHeight - cursorHeight) / 2);
+    if (cursorVisible) {
+      ctx.fillStyle = NANO_INK;
+      ctx.fillRect(cx, cursorY, Math.max(2, Math.round(charWidth * 0.7)), cursorHeight);
+      ctx.fillStyle = NANO_BG;
+      ctx.fillText(curText[safeCol] || " ", cx, Math.round(rowBase + fontMetrics.ascent + 2));
+    }
+
+    const footer = ` ^X Exit    ^O Save  ${nano.savedMsg || ""}`;
+    drawText(footer, rows - 1);
   }
 
   function startBlink() {
@@ -769,10 +801,17 @@ const Terminal = (() => {
     }
   }
 
-  function nanoEdit(filename, content) {
+  function nanoEdit(filename, content, onSave) {
     return new Promise((resolve) => {
       mode = "nano";
-      nano = { filename, buffer: content || "", cursor: (content || "").length, resolve };
+      nano = {
+        filename,
+        buffer: content || "",
+        cursor: (content || "").length,
+        onSave,
+        savedMsg: "",
+        resolve,
+      };
       render();
     });
   }
@@ -790,7 +829,11 @@ const Terminal = (() => {
     }
     if (e.ctrlKey && (e.key === "o" || e.key === "O")) {
       e.preventDefault();
-      return; 
+      const lineCount = nano.buffer.split("\n").length;
+      if (nano.onSave) nano.onSave(nano.buffer);
+      nano.savedMsg = `Wrote ${lineCount} line${lineCount === 1 ? "" : "s"}`;
+      render();
+      return;
     }
     if (e.key === "Backspace") {
       e.preventDefault();
