@@ -31,10 +31,12 @@ I don't need to tell that. Do I?
 ## Customize the content
 
 The filesystem is defined in filesystem.js. That file controls:
-- folders like projects, socials, and graphics
+- folders like projects, socials, blogs and graphics
 - files shown in the terminal
 - links opened by curl
 - any custom text content for cat and other commands; you can check [shell commands](https://explainshell.com) here and add them. 
+
+Your blog posts live in the `blogs` folder (inside `js/filesystem.js`, under `blogs: dir({ ... })`). Edit the post title (the bit before the `:`), the text, and the `url` — the Blogs menu + clicking a post opens that url. 
 
 ## Notes
 
