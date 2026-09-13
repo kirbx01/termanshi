@@ -236,7 +236,7 @@ canvas {
   font-weight: 700;
   line-height: 1.2;
   white-space: pre;
-  font-size: clamp(9px, 2.4vw, 16px);
+  font-size: clamp(8px, 1.9vw, 12px);
   background: linear-gradient(180deg, var(--term-amber) 0%, #ff9a3d 62%, #ffe9a3 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -245,7 +245,7 @@ canvas {
 
 @supports (container-type: inline-size) {
   #login-banner {
-    font-size: calc(4cqi);
+    font-size: calc(2.7cqi);
   }
 }
 

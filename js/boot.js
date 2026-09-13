@@ -217,9 +217,9 @@ async function waitForLogin() {
 }
 
 async function main() {
-  await Terminal.init();
   const loginEl = document.getElementById("login-screen");
   if (loginEl) loginEl.classList.add("boot");
+  await Terminal.init();
   await runGrubSequence();
   await runBootSequence();
   if (loginEl) loginEl.classList.remove("boot");
