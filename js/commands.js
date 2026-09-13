@@ -176,10 +176,15 @@ const Shell = (() => {
 
   function cmd_cat(args) {
     if (!args[0]) { Terminal.print("usage: cat <file>"); return; }
-    const { node } = resolveNode(args[0]);
+    const { node, parts } = resolveNode(args[0]);
     if (!node) { Terminal.print(`cat: ${args[0]}: No such file or directory`); return; }
     if (node.type === "dir") { Terminal.print(`cat: ${args[0]}: Is a directory`); return; }
-    Terminal.print(node.content || "");
+    const isBlog = parts.includes("blogs") && parts[parts.length - 1] !== "blogs";
+    if (isBlog && Terminal.printMarkdown) {
+      Terminal.printMarkdown(node.content || "");
+    } else {
+      Terminal.print(node.content || "");
+    }
   }
 
   function cmd_touch(args) {

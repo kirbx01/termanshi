@@ -1169,6 +1169,90 @@ const Terminal = (() => {
     }
   }
 
+  const MD_HEADING = "#ffaa00";
+  const MD_BOLD = "#c17cff";
+  const MD_CODE = "#4dffef";
+  const MD_BULLET = "#ffc1cc";
+  const MD_BRIGHT = "#f2f2f2";
+
+  function mdInline(text) {
+    const segments = [];
+    const parts = String(text).split(/(\*\*[^*]+\*\*)/g);
+    for (const part of parts) {
+      if (!part) continue;
+      if (part.startsWith("**") && part.endsWith("**")) {
+        segments.push({ text: part.slice(2, -2), color: MD_BOLD });
+      } else {
+        segments.push({ text: part });
+      }
+    }
+    return segments.length ? segments : [{ text: "" }];
+  }
+
+  function markdownLines(text) {
+    const src = String(text || "").split("\n");
+    const out = [];
+    let inCode = false;
+    for (const line of src) {
+      if (line.trimStart().startsWith("```")) {
+        inCode = !inCode;
+        continue;
+      }
+      if (inCode) {
+        out.push([{ text: line, color: MD_CODE }]);
+        continue;
+      }
+      if (!line.trim()) { out.push([{ text: "" }]); continue; }
+      const hm = line.match(/^(#{1,3})\s+(.*)/);
+      if (hm) {
+        const segs = mdInline(hm[2]).map((s) => ({ ...s, color: MD_BRIGHT }));
+        segs.unshift({ text: "▸ ", color: MD_HEADING });
+        out.push(segs);
+        continue;
+      }
+      const lm = line.match(/^(\s*)([-*])\s+(.*)/);
+      if (lm) {
+        out.push([{ text: lm[1] + lm[2] + " ", color: MD_BULLET }, ...mdInline(lm[3])]);
+        continue;
+      }
+      out.push(mdInline(line));
+    }
+    return out;
+  }
+  function wrapRichLine(segs, limit) {
+    const lines = [];
+    let cur = [], curLen = 0;
+    const flush = () => { if (cur.length) { lines.push(cur); cur = []; curLen = 0; } };
+    const seg = (text, color) => (color ? { text, color } : { text });
+    for (const s of segs) {
+      const toks = String(s.text || "").split(/(\s+)/);
+      for (const t of toks) {
+        if (!t) continue;
+        const isSpace = /^\s+$/.test(t);
+        if (isSpace) {
+          if (curLen + t.length <= limit) { cur.push(seg(t)); curLen += t.length; }
+          else flush();
+        } else if (curLen + t.length <= limit) {
+          cur.push(seg(t, s.color)); curLen += t.length;
+        } else if (t.length > limit) {
+          flush();
+          let r = t;
+          while (r.length > limit) { lines.push([seg(r.slice(0, limit), s.color)]); r = r.slice(limit); }
+          if (r) { cur.push(seg(r, s.color)); curLen = r.length; }
+        } else { flush(); cur.push(seg(t, s.color)); curLen = t.length; }
+      }
+    }
+    flush();
+    return lines.length ? lines : [[{ text: "" }]];
+  }
+
+  function printMarkdown(text) {
+    const w = cols || 80;
+    for (const segs of markdownLines(text)) {
+      for (const line of wrapRichLine(segs, w)) printRich(line);
+    }
+  }
+
   async function init() {
     await loadFonts();
     resize();
@@ -1179,6 +1263,7 @@ const Terminal = (() => {
 
   return {
     init, print, printRich, printColumns, clear, sleep,
+    printMarkdown,
     typeLine, typeLines, readLine, nanoEdit,
     printClickable, runCommand,
     focusInput: focusHiddenInput,
