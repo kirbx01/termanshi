@@ -103,8 +103,23 @@ const Shell = (() => {
         const size = child.type === "file" ? String((child.content || "").length).padStart(5, " ") : "  4096";
         Terminal.print(`${type}${perms} 1 panshi panshi ${size} Jan 1 00:00 ${n}${child.type === "dir" ? "/" : ""}`);
       }
-    } else {
-      Terminal.print(names.map(n => node.children[n].type === "dir" ? n + "/" : n).join("   "));
+      return;
+    }
+    for (const n of names) {
+      const child = node.children[n];
+      const childParts = parts.concat([n]);
+      const path = fsPathString(childParts);
+      let cmd;
+      let hint;
+      if (child.type === "dir") { cmd = `cd ${path}`; hint = "open"; }
+      else if (child.url) { cmd = `curl ${path}`; hint = "open link"; }
+      else if (/\.pdf$/i.test(n)) { cmd = `curl ${path}`; hint = "download"; }
+      else { cmd = `cat ${path}`; hint = "view"; }
+      Terminal.printClickable({
+        label: n + (child.type === "dir" ? "/" : ""),
+        cmd,
+        hint,
+      });
     }
   }
 
@@ -200,7 +215,7 @@ const Shell = (() => {
     const target = args[0].trim();
     const normalized = target.toLowerCase();
 
-    if (normalized === "resume.pdf" || normalized === "resume") {
+    if (/\.pdf$/i.test(target) || normalized === "resume.pdf" || normalized === "resume") {
       Terminal.print("Downloading Resume.pdf ...");
       try {
         await downloadResume();
@@ -246,10 +261,11 @@ const Shell = (() => {
  //colors of terminal
  //bydefault the rgb animation and you can static by using color <colorname>
   function cmd_color(args) {
-    const names = Terminal.THEME_NAMES.join(", ");
     if (!args[0] || args[0] === "list") {
-      Terminal.print(`Available themes: ${names}`);
       Terminal.print(`Current theme: ${Terminal.getTheme()}`);
+      for (const name of Terminal.THEME_NAMES) {
+        Terminal.printClickable({ label: name, cmd: `color ${name}` });
+      }
       Terminal.print("usage: color <name>");
       return;
     }
@@ -258,7 +274,7 @@ const Shell = (() => {
       Terminal.print(`Terminal color set to '${name}'.`);
     } else {
       Terminal.print(`color: unknown theme '${args[0]}'`);
-      Terminal.print(`Available themes: ${names}`);
+      Terminal.print(`Available themes: ${Terminal.THEME_NAMES.join(", ")}`);
     }
   }
 

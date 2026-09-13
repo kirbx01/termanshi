@@ -225,7 +225,22 @@ const Terminal = (() => {
         ctx.shadowBlur = GLOW_BLUR;
         ctx.fillStyle = c;
         ctx.fillText(seg.text, Math.round(x), baseY);
-        x += ctx.measureText(seg.text).width;
+        const w = ctx.measureText(seg.text).width;
+        if (seg.click) {
+          ctx.strokeStyle = c;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(Math.round(x), Math.round(baseY + 2));
+          ctx.lineTo(Math.round(x + w), Math.round(baseY + 2));
+          ctx.stroke();
+          const rowY0 = padTop + rowIndex * lineHeight;
+          const rowY1 = padTop + (rowIndex + 1) * lineHeight;
+          clickRegions.push({
+            box: { x0: padLeft, x1: padLeft + Math.max(cols, 1) * charWidth, y0: rowY0, y1: rowY1 },
+            cmd: seg.cmd || "",
+          });
+        }
+        x += w;
       }
       return;
     }
@@ -409,6 +424,7 @@ const Terminal = (() => {
     const visible = displayLines.slice(-rows);
     const startRow = 0;
     let sugRowIndex = -1;
+    resetClickRegions();
     if (sugIndex !== -1) sugRowIndex = sugIndex - (displayLines.length - visible.length);
     for (let i = 0; i < visible.length; i++) {
       if (suggestions && i === sugRowIndex) {
@@ -474,6 +490,65 @@ const Terminal = (() => {
     lines.push(segments);
     if (lines.length > MAX_SCROLLBACK) lines = lines.slice(-MAX_SCROLLBACK);
     render();
+  }
+
+  // Clickable-entry tracking. Rich segments flagged with `click: true` become
+  // tappable: while they're visible on screen, a tap on their bounds runs the
+  // stored shell command through the normal prompt loop (so it echoes as typed).
+  const clickRegions = [];
+
+  function printClickable({ label, cmd, hint }) {
+    const entry = [];
+    if (hint) entry.push({ text: String(hint) + " " });
+    entry.push({ text: label, click: true, cmd: cmd || "" });
+    printRich(entry);
+  }
+
+  function resetClickRegions() {
+    clickRegions.length = 0;
+  }
+
+  function runClickAction(clientX, clientY) {
+    if (!terminalPane) return false;
+    if (window.__TM_DEBUG) console.error("[runClickAction]", "regions:", clickRegions.length, clickRegions.map(r => ({ y0: r.box.y0, y1: r.box.y1, x0: r.box.x0, x1: r.box.x1, cmd: r.cmd })));
+    const rect = terminalPane.getBoundingClientRect();
+    const dx = clientX - rect.left;
+    const dy = clientY - rect.top;
+    for (let i = clickRegions.length - 1; i >= 0; i--) {
+      const reg = clickRegions[i];
+      const pad = 4;
+      if (dx >= reg.box.x0 - pad && dx <= reg.box.x1 + pad &&
+          dy >= reg.box.y0 - pad && dy <= reg.box.y1 + pad) {
+        if (reg.cmd) runCommand(reg.cmd);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Feed a command through the running shell loop as if it had been typed.
+  // If a prompt is waiting, it resolves with the command so boot re-executes
+  // it and re-prints the prompt afterwards.
+  function runCommand(cmd) {
+    cmd = String(cmd || "").trim();
+    if (cmd === "") return;
+    if (liveLine) {
+      lines.push(liveLine.prefix + cmd);
+      liveLine = null;
+      tabHandler = null;
+      suggestionsProvider = null;
+      suggestions = null;
+      currentHistory = null;
+      const resolve = inputResolver;
+      inputResolver = null;
+      inputReject = null;
+      const hidden = document.getElementById("hidden-input");
+      if (hidden) hidden.value = "";
+      render();
+      if (resolve) resolve(cmd);
+      return;
+    }
+    if (window.Shell && Shell.execute) Shell.execute(cmd);
   }
 
   function printColumns(leftLines, rightLines, gap = 4) {
@@ -1035,16 +1110,25 @@ const Terminal = (() => {
     window.visualViewport.addEventListener("resize", resize);
     window.visualViewport.addEventListener("scroll", resize);
   }
-  window.addEventListener("pointerdown", (event) => {
-    if (!userInputActive()) return;
-    if (tryRunSuggestion(event)) return;
-    focusHiddenInput();
-  }, { passive: true });
+  let suppressFocus = false;
   document.addEventListener("pointerdown", (event) => {
     if (!userInputActive()) return;
+    if (runClickAction(event.clientX, event.clientY)) {
+      suppressFocus = true;
+      return;
+    }
     if (event.target instanceof HTMLElement && event.target.closest("button, input")) return;
     focusHiddenInput();
   });
+  window.addEventListener("pointerdown", (event) => {
+    if (!userInputActive()) return;
+    if (suppressFocus) {
+      suppressFocus = false;
+      return;
+    }
+    if (tryRunSuggestion(event)) return;
+    focusHiddenInput();
+  }, { passive: true });
   window.addEventListener("touchstart", handleTouchStart, { passive: true });
   window.addEventListener("touchmove", handleTouchMove, { passive: true });
   window.addEventListener("touchend", handleTouchEnd, { passive: true });
@@ -1073,6 +1157,7 @@ const Terminal = (() => {
   return {
     init, print, printRich, printColumns, clear, sleep,
     typeLine, typeLines, readLine, nanoEdit,
+    printClickable, runCommand,
     focusInput: focusHiddenInput,
     setTheme, getTheme, THEME_NAMES, DOT_HUES,
     setFontSize, adjustFontSize, setFontFamily, resetFont, getFontInfo,

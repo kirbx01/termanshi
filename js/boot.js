@@ -143,14 +143,22 @@ function initLogin() {
   }
 }
 
+const MENU_COMMANDS = {
+  file: "ls",
+  format: "start",
+  settings: "color",
+  help: "help",
+};
+
 function initMenuBar() {
   const bar = document.getElementById("menu-bar");
   if (!bar) return;
   bar.querySelectorAll(".menu-item").forEach((button) => {
     button.addEventListener("click", () => {
       if (!isTerminalActive()) return;
-      if (button.dataset.menu === "help") Shell.execute("help");
-      Terminal.focusInput();
+      const cmd = MENU_COMMANDS[button.dataset.menu];
+      if (cmd) Terminal.runCommand(cmd);
+      else Terminal.focusInput();
     });
   });
 }
