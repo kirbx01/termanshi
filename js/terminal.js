@@ -238,8 +238,19 @@ const Terminal = (() => {
           ctx.stroke();
           const rowY0 = padTop + rowIndex * lineHeight;
           const rowY1 = padTop + (rowIndex + 1) * lineHeight;
+          const wx0 = padLeft - lineHeight * 0.5;
+          const wx1 = padLeft + (Math.max(cols, 1)) * charWidth + lineHeight * 0.5;
+          const p0 = warpPoint(wx0, rowY0);
+          const p1 = warpPoint(wx1, rowY0);
+          const p2 = warpPoint(wx0, rowY1);
+          const p3 = warpPoint(wx1, rowY1);
           clickRegions.push({
-            box: { x0: padLeft, x1: padLeft + Math.max(cols, 1) * charWidth, y0: rowY0, y1: rowY1 },
+            box: {
+              x0: Math.min(p0.x, p1.x, p2.x, p3.x),
+              x1: Math.max(p0.x, p1.x, p2.x, p3.x),
+              y0: Math.min(p0.y, p1.y, p2.y, p3.y),
+              y1: Math.max(p0.y, p1.y, p2.y, p3.y),
+            },
             cmd: seg.cmd || "",
           });
         }
