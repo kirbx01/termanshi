@@ -7,9 +7,10 @@
 
 > Just incase you hate the current colour and font size or style just get do `setfont 26/27/28` and `color` to set your beloved options. 
 
-![Image](demo.png)
-![This is what happens on formatting](format.png)
-![This is just blog page i dont write blogs as of now but i really will resume](blog.png)
+![Image](images/login.png)
+![This is what happens on formatting](images/format.png)
+![This is how you can operate](images/demo.png)
+![This is just blog page i dont write blogs as of now but i really will resume](images/cursordisplay.jpeg)
 
 ## What it is
 Well clearly a portfolio website. 
