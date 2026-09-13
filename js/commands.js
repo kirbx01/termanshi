@@ -182,6 +182,8 @@ const Shell = (() => {
     const isBlog = parts.includes("blogs") && parts[parts.length - 1] !== "blogs";
     if (isBlog && Terminal.printMarkdown) {
       Terminal.printMarkdown(node.content || "");
+      Terminal.print("");
+      Terminal.printClickable({ label: "type sm to edit this post", cmd: "sm", hint: "edit" });
     } else {
       Terminal.print(node.content || "");
     }
@@ -350,7 +352,7 @@ const Shell = (() => {
       const prev = parent.children[name];
       parent.children[name] = file(buf, prev && prev.type === "file" ? prev.url : null);
     };
-    const result = await Terminal.nanoEdit(name, content || "", save);
+    const result = await Terminal.nanoEdit(name, content || "", save, { italic: true });
     save(result);
 
     Terminal.print(`Blog '${name}' saved to ${fsPathString(["home", defaultHome, "blogs", name])}`);

@@ -477,6 +477,9 @@ const Terminal = (() => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
     applyFont();
+    if (nano.italic) {
+      ctx.font = `italic ${FONT_WEIGHT} ${fontSize}px ${fontStackFor(currentFontKey)}`;
+    }
     ctx.shadowColor = "#000000";
     ctx.shadowBlur = 0;
     ctx.fillStyle = NANO_INK;
@@ -806,15 +809,17 @@ const Terminal = (() => {
     }
   }
 
-  function nanoEdit(filename, content, onSave) {
+  function nanoEdit(filename, content, onSave, options) {
     return new Promise((resolve) => {
       mode = "nano";
+      const opts = options || {};
       nano = {
         filename,
         buffer: content || "",
         cursor: (content || "").length,
         onSave,
         savedMsg: "",
+        italic: !!opts.italic,
         resolve,
       };
       render();
