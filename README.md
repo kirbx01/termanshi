@@ -11,6 +11,7 @@
 ![This is what happens on formatting](images/format.png)
 ![This is how you can operate](images/demo.png)
 ![This is just blog page i dont write blogs as of now but i really will resume](images/cursordisplay.jpeg)
+![GNU NANO](images/nano.png)
 
 ## What it is
 Well clearly a portfolio website. 
