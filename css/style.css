@@ -86,7 +86,7 @@ html, body {
   position: relative;
   z-index: 10;
   flex: 0 0 auto;
-  display: flex;
+  display: none;
   align-items: center;
   gap: 2px;
   height: 36px;
@@ -99,8 +99,8 @@ html, body {
   background: var(--term-accent);
 }
 
-#menu-bar.hidden {
-  display: none;
+#menu-bar.visible {
+  display: flex;
 }
 
 .menu-item {

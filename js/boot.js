@@ -219,7 +219,6 @@ async function waitForLogin() {
 async function main() {
   const loginEl = document.getElementById("login-screen");
   const menuBar = document.getElementById("menu-bar");
-  if (menuBar) menuBar.classList.add("hidden");
   await Terminal.init();
   await runGrubSequence();
   await runBootSequence();
@@ -231,7 +230,7 @@ async function main() {
   }
   await waitForLogin();
   hideLoginScreen();
-  if (menuBar) menuBar.classList.remove("hidden");
+  if (menuBar) menuBar.classList.add("visible");
   while (true) {
     await runLogin();
     await runShellLoop();

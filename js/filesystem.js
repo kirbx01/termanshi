@@ -83,20 +83,25 @@ curl Port0000  ->  opens the GitHub repository`,
 //To edit a post (or write a new one) type `sm` in the terminal.
       blogs: dir({
         "blog-1-hasi-mazak": file(
-`### Camzo maths app
+`## Blog #1 - Hello soldering world
 
-My journey building my latest maths app.`),
+I just hope to know something when i complete these`),
 
         "blog-2-hasi-mazak2-since-ihavencluewhattoput": file(
-`Blog #2 - How I riced my setup
+`## Blog #2 - How I riced my setup
 
-
-HI`,
-          "Hi"),
+HI`),
 
         "blog-3-idontwriteblogssoewu-infutureill": file(
-`Blog #3 - Kei, Osaka and engineering`,
-          "OK"),
+`## Blog #3 - Kei, Osaka and engineering
+
+Short one today. **Kei**, **Osaka** and engineering keep me going.
+
+- **Kei** - feelings are hard, firmware is easy
+- **Osaka** - too powerful for this world
+- **DIO BRANDO** - menace in a scarf
+
+Until next time.`),
       }),
     }),
   }),

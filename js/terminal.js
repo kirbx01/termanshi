@@ -1183,7 +1183,15 @@ const Terminal = (() => {
       if (part.startsWith("**") && part.endsWith("**")) {
         segments.push({ text: part.slice(2, -2), color: MD_BOLD });
       } else {
-        segments.push({ text: part });
+        const codeParts = part.split(/(`[^`]+`)/g);
+        for (const cp of codeParts) {
+          if (!cp) continue;
+          if (cp.startsWith("`") && cp.endsWith("`")) {
+            segments.push({ text: cp.slice(1, -1), color: MD_CODE });
+          } else {
+            segments.push({ text: cp });
+          }
+        }
       }
     }
     return segments.length ? segments : [{ text: "" }];
