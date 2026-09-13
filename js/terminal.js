@@ -95,6 +95,13 @@ const Terminal = (() => {
 
   let nano = null; 
 
+  const CAT_CURSOR_FRAMES = ["js/assets/cat06_f0.png", "js/assets/cat06_f1.png"].map((src) => {
+    const img = new Image();
+    img.src = src;
+    return img;
+  });
+  let catCursorFrameIndex = 0;
+
   function applyFont() {
     ctx.font = `${FONT_WEIGHT} ${fontSize}px ${fontStackFor(currentFontKey)}`;
     ctx.textBaseline = "alphabetic";
@@ -257,13 +264,26 @@ const Terminal = (() => {
   function drawCursorBlock(text, colIndex, rowIndex) {
     if (!cursorVisible) return;
     const x = getCursorX(text, colIndex);
-    const y = Math.round(padTop + rowIndex * lineHeight + 1);
-    const cursorHeight = Math.max(2, Math.round(lineHeight - 4));
+    const frame = CAT_CURSOR_FRAMES[catCursorFrameIndex];
+    const hasCat = frame && frame.complete && frame.naturalWidth > 0;
     const c = baseColor();
-    ctx.shadowColor = c;
-    ctx.shadowBlur = GLOW_BLUR;
-    ctx.fillStyle = c;
-    ctx.fillRect(x, y, Math.max(2, Math.round(charWidth * 0.7)), cursorHeight);
+
+    if (hasCat) {
+      const size = lineHeight;
+      const catY = Math.round(padTop + rowIndex * lineHeight + (lineHeight - size) / 2);
+      ctx.save();
+      ctx.shadowColor = c;
+      ctx.shadowBlur = GLOW_BLUR;
+      ctx.drawImage(frame, x, catY, size, size);
+      ctx.restore();
+    } else {
+      const cursorHeight = Math.max(2, Math.round(lineHeight - 4));
+      const y = Math.round(padTop + rowIndex * lineHeight + (lineHeight - cursorHeight) / 2);
+      ctx.shadowColor = c;
+      ctx.shadowBlur = GLOW_BLUR;
+      ctx.fillStyle = c;
+      ctx.fillRect(x, y, Math.max(2, Math.round(charWidth * 0.7)), cursorHeight);
+    }
   }
 
   function userInputActive() {
@@ -468,6 +488,7 @@ const Terminal = (() => {
     if (blinkTimer) return;
     blinkTimer = setInterval(() => {
       cursorVisible = !cursorVisible;
+      catCursorFrameIndex = (catCursorFrameIndex + 1) % CAT_CURSOR_FRAMES.length;
       render();
     }, 500);
   }
