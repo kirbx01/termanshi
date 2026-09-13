@@ -341,7 +341,10 @@ const Shell = (() => {
     const node = fsGetNode(parts);
     const content = node && node.type === "file" ? node.content : "";
 
-    const save = (buf) => { parent.children[name] = file(buf); };
+    const save = (buf) => {
+      const prev = parent.children[name];
+      parent.children[name] = file(buf, prev && prev.type === "file" ? prev.url : null);
+    };
     const result = await Terminal.nanoEdit(name, content || "", save);
     save(result);
 
