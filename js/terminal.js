@@ -510,7 +510,6 @@ const Terminal = (() => {
 
   function runClickAction(clientX, clientY) {
     if (!terminalPane) return false;
-    if (window.__TM_DEBUG) console.error("[runClickAction]", "regions:", clickRegions.length, clickRegions.map(r => ({ y0: r.box.y0, y1: r.box.y1, x0: r.box.x0, x1: r.box.x1, cmd: r.cmd })));
     const rect = terminalPane.getBoundingClientRect();
     const dx = clientX - rect.left;
     const dy = clientY - rect.top;

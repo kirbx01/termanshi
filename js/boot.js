@@ -156,9 +156,14 @@ function initMenuBar() {
   bar.querySelectorAll(".menu-item").forEach((button) => {
     button.addEventListener("click", () => {
       if (!isTerminalActive()) return;
-      const cmd = MENU_COMMANDS[button.dataset.menu];
-      if (cmd) Terminal.runCommand(cmd);
-      else Terminal.focusInput();
+      const menu = button.dataset.menu;
+      const cmd = MENU_COMMANDS[menu];
+      if (cmd) {
+        Terminal.clear();
+        Terminal.runCommand(cmd);
+      } else {
+        Terminal.focusInput();
+      }
     });
   });
 }
