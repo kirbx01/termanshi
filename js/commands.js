@@ -29,6 +29,7 @@ const Shell = (() => {
   pwd               print working directory
   cd [dir]          change directory
   ls [-la] [dir]    list directory contents
+  blogs             show blog posts
   tree [dir]        show directory tree
   cat <file>        print file contents
   touch <file>      create an empty file
@@ -120,6 +121,29 @@ const Shell = (() => {
         cmd,
         hint,
       });
+    }
+  }
+
+  function cmd_blogs() {
+    const blogsNode = fsGetNode(["home", defaultHome, "blogs"]);
+    if (!blogsNode || blogsNode.type !== "dir") {
+      Terminal.print("No blogs yet - add entries in js/filesystem.js.");
+      return;
+    }
+    const names = Object.keys(blogsNode.children);
+    if (names.length === 0) {
+      Terminal.print("No blogs yet - add entries in js/filesystem.js.");
+      return;
+    }
+    Terminal.print(`${names.length} blog post${names.length === 1 ? "" : "s"} (click to open)`);
+    for (const n of names) {
+      const child = blogsNode.children[n];
+      const path = fsPathString(["home", defaultHome, "blogs", n]);
+      if (child.url) {
+        Terminal.printClickable({ label: n.replace(/\.txt$/i, ""), cmd: `curl ${path}`, hint: "open" });
+      } else {
+        Terminal.printClickable({ label: n, cmd: `cat ${path}`, hint: "view" });
+      }
     }
   }
 
@@ -282,11 +306,11 @@ const Shell = (() => {
   //   setfont            show current font + usage
   //   setfont + / ++     increase size (by 1 / 2 px)
   //   setfont - / --     decrease size (by 1 / 2 px)
-  //   setfont -inc/-dec  same as + / -
-  //   setfont <18>       set an exact pixel size
-  //   setfont <family>   jetbrains | plex | space
-  //   setfont reset      restore defaults
-  // for updations if anyone want to check how the thing works
+//   setfont -inc/-dec  same as + / -
+//   setfont <18>       set an exact pixel size
+//   setfont <family>   xanh
+//   setfont reset      restore defaults
+// for updations if anyone want to check how the thing works
 
   function cmd_setfont(args) {
     const families = Object.keys(Terminal.FONT_FAMILIES).join(", ");
@@ -539,6 +563,7 @@ const Shell = (() => {
     pwd: () => cmd_pwd(),
     cd: cmd_cd,
     ls: cmd_ls,
+    blogs: () => cmd_blogs(),
     tree: cmd_tree,
     cat: cmd_cat,
     touch: cmd_touch,

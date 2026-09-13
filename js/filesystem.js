@@ -76,6 +76,32 @@ curl Port0000  ->  opens the GitHub repository`,
       socials: dir({
         GitHub: file("Code & firmware repos.\ncurl GitHub -> opens profile", "https://github.com/kirbx01"),
       }),
+//blogs -- your blog posts live here
+//Update the title (the key before the colon), the text content, and the
+//url (second arg of file()) and the Blogs menu will pick them up +
+//clicking one in the terminal opens the url in a new tab.
+      blogs: dir({
+        "blog-1-hello-soldering.txt": file(
+`Blog #1 - Hello soldering world
+URL: https://your-blog.example/1
+
+PLACEHOLDER - replace this text and the url in js/filesystem.js`,
+          "https://your-blog.example/1"),
+
+        "blog-2-ricing-setup.txt": file(
+`Blog #2 - How I riced my setup
+URL: https://your-blog.example/2
+
+PLACEHOLDER - replace this text and the url in js/filesystem.js`,
+          "https://your-blog.example/2"),
+
+        "blog-3-kei-and-engineering.txt": file(
+`Blog #3 - Kei, Osaka and engineering
+URL: https://your-blog.example/3
+
+PLACEHOLDER - replace this text and the url in js/filesystem.js`,
+          "https://your-blog.example/3"),
+      }),
     }),
   }),
   etc: dir({}),

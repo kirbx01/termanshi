@@ -3,7 +3,8 @@
   --term-amber: #ffdd00;
   --term-amber-dim: rgba(255, 221, 0, 0.42);
   --term-fg: #f2f2f2;
-  --term-mono: "JetBrains Mono", "IBM Plex Mono", "Space Mono", monospace;
+  --term-mono: "Xanh Mono", monospace;
+  --term-header: "Jacquard 12", monospace;
 }
 
 * {
@@ -90,12 +91,12 @@ html, body {
   gap: 2px;
   height: 36px;
   padding: 0 10px;
-  font-family: var(--term-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.10em;
-  color: rgba(255, 255, 255, 0.72);
-  border-bottom: 1px solid var(--term-amber-dim);
-  background: rgba(8, 8, 8, 0.92);
+  font-family: var(--term-header);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: #000000;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.55);
+  background: var(--term-amber);
 }
 
 .menu-item {
@@ -112,18 +113,25 @@ html, body {
   cursor: pointer;
 }
 
+.menu-item:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
+
 .menu-item:active {
-  color: var(--term-amber);
+  background: rgba(0, 0, 0, 0.22);
+  color: #000000;
 }
 
 .menu-item:focus-visible {
-  outline: 1px dashed rgba(255, 221, 0, 0.5);
+  outline: 1px dashed rgba(0, 0, 0, 0.7);
   outline-offset: -2px;
 }
 
 .menu-help {
   margin-left: auto;
-  color: var(--term-amber);
+  color: #000000;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ---- CRT terminal pane ---- */
@@ -236,11 +244,11 @@ canvas {
 #login-banner {
   margin: 0 0 4px;
   overflow: hidden;
-  font-family: var(--term-mono);
-  font-weight: 700;
+  font-family: var(--term-header);
+  font-weight: 400;
   line-height: 1.12;
   white-space: pre;
-  font-size: clamp(4px, 1.45vw, 8px);
+  font-size: clamp(5px, 1.45vw, 9px);
   background: linear-gradient(180deg, var(--term-amber) 0%, #ff9a3d 62%, #ffe9a3 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -260,9 +268,10 @@ canvas {
 }
 
 .login-label-text {
-  font-family: var(--term-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.2em;
+  font-family: var(--term-header);
+  font-weight: 400;
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
   color: rgba(255, 255, 255, 0.62);
 }
 
@@ -272,7 +281,7 @@ canvas {
   padding: 0 12px;
   font-family: var(--term-mono);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.08em;
   color: var(--term-fg);
   background: #0d0d0d;
@@ -308,7 +317,7 @@ canvas {
   min-height: 46px;
   height: 46px;
   font-family: var(--term-mono);
-  font-weight: 700;
+  font-weight: 400;
   font-size: 0.85rem;
   letter-spacing: 0.24em;
   color: #000000;

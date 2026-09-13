@@ -55,17 +55,15 @@ const Terminal = (() => {
   function getTheme() { return currentTheme; }
 
   const FONT_FAMILIES = {
-    jetbrains: '"JetBrains Mono"',
-    plex: '"IBM Plex Mono"',
-    space: '"Space Mono"',
+    xanh: '"Xanh Mono"',
   };
-  const FONT_WEIGHT = 700;
+  const FONT_WEIGHT = 400;
   const DEFAULT_FONT_SIZE = 17;
   const MIN_FONT_SIZE = 12;
   const MAX_FONT_SIZE = 26;
-  let currentFontKey = "jetbrains";
+  let currentFontKey = "xanh";
   let fontSize = DEFAULT_FONT_SIZE;
-  let lineHeight = 23;
+  let lineHeight = 25;
   let padLeft = 24;
   let padTop = 24;
   let charWidth = 0;
@@ -74,8 +72,8 @@ const Terminal = (() => {
   let fontMetrics = { ascent: 12, descent: 3, height: 15 };
 
   function fontStackFor(key) {
-    const primary = FONT_FAMILIES[key] || FONT_FAMILIES.jetbrains;
-    return `${primary}, "JetBrains Mono", "IBM Plex Mono", "Space Mono", monospace`;
+    const primary = FONT_FAMILIES[key] || FONT_FAMILIES.xanh;
+    return `${primary}, "Xanh Mono", monospace`;
   }
 
   let lines = [];              
@@ -122,7 +120,7 @@ const Terminal = (() => {
     const clamped = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, Math.round(px)));
     const changed = clamped !== fontSize;
     fontSize = clamped;
-    lineHeight = Math.round(fontSize * 1.35);
+    lineHeight = Math.round(fontSize * 1.45);
     resize();
     return changed;
   }
@@ -137,9 +135,9 @@ const Terminal = (() => {
   }
 
   function resetFont() {
-    currentFontKey = "jetbrains";
+    currentFontKey = "xanh";
     fontSize = DEFAULT_FONT_SIZE;
-    lineHeight = 23;
+    lineHeight = 25;
     resize();
   }
 
@@ -1136,9 +1134,8 @@ const Terminal = (() => {
     if (!document.fonts) return; 
     try {
       await Promise.all([
-        document.fonts.load(`${FONT_WEIGHT} ${fontSize}px "JetBrains Mono"`),
-        document.fonts.load(`${FONT_WEIGHT} ${fontSize}px "IBM Plex Mono"`),
-        document.fonts.load(`${FONT_WEIGHT} ${fontSize}px "Space Mono"`),
+        document.fonts.load(`${FONT_WEIGHT} ${fontSize}px "Xanh Mono"`),
+        document.fonts.load(`400 ${fontSize}px "Jacquard 12"`),
       ]);
       await document.fonts.ready;
     } catch (e) {       

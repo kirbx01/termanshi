@@ -146,7 +146,7 @@ function initLogin() {
 const MENU_COMMANDS = {
   file: "ls",
   format: "start",
-  settings: "color",
+  blogs: "blogs",
   help: "help",
 };
 
