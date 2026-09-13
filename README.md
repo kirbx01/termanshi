@@ -3,6 +3,7 @@
 >This lags HEAVILY on firefox and firefox based browsers due to the heavier webgl components so be careful about it pls.
 >Also the phone ui is a lil broken due to lack of creative assets that couldve been possibly injected but complicated asciis are vry not cx friendly hence the work has not been put through yet and will be done wen i reupdate it.
 
+> Just added the demos for the website if one wants to see how the website looks like.
 
 ![Image](demo.png)
 ![This is what happens on formatting](format.png)
