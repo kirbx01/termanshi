@@ -516,23 +516,62 @@ const Shell = (() => {
     });
   }
 
-  // tab completion
-  function tabComplete(typed) {
-    const parts = typed.split(" ");
-    const last = parts[parts.length - 1];
+  // registry of every valid command - also drives autocomplete
+  const COMMANDS = {
+    help: () => cmd_help(),
+    clear: () => Terminal.clear(),
+    pwd: () => cmd_pwd(),
+    cd: cmd_cd,
+    ls: cmd_ls,
+    tree: cmd_tree,
+    cat: cmd_cat,
+    touch: cmd_touch,
+    mkdir: cmd_mkdir,
+    rm: cmd_rm,
+    echo: cmd_echo,
+    history: () => cmd_history(),
+    date: () => cmd_date(),
+    whoami: () => cmd_whoami(),
+    hostname: () => cmd_hostname(),
+    uname: cmd_uname,
+    neofetch: () => cmd_neofetch(),
+    start: () => cmd_start(),
+    curl: cmd_curl,
+    nano: cmd_nano,
+    sudo: () => cmd_sudo(),
+    color: cmd_color,
+    setfont: cmd_setfont,
+    volume: cmd_volume,
+    matrix: () => cmd_matrix(),
+    tictactoe: () => cmd_tictactoe(),
+    reboot: () => cmd_reboot(),
+    exit: () => cmd_exit(),
+  };
+
+  // filesystem-side completion (command args / paths), shared by Tab and suggestions
+  function fsCompletion(last) {
     const dirPart = last.includes("/") ? last.slice(0, last.lastIndexOf("/") + 1) : "";
     const prefix = last.includes("/") ? last.slice(last.lastIndexOf("/") + 1) : last;
     const { node } = resolveNode(dirPart);
-    if (!node || node.type !== "dir") return null;
-    const matches = Object.keys(node.children).filter(n => n.startsWith(prefix));
-    if (matches.length === 1) {
-      parts[parts.length - 1] = dirPart + matches[0] + (node.children[matches[0]].type === "dir" ? "/" : "");
-      return parts.join(" ");
+    if (!node || node.type !== "dir") return [];
+    return Object.keys(node.children)
+      .filter(n => n.startsWith(prefix))
+      .sort()
+      .map(n => dirPart + n + (node.children[n].type === "dir" ? "/" : ""));
+  }
+
+  function getCompletions(typed) {
+    const value = String(typed || "");
+    if (!value.trim()) return [];
+    const hasTrailingSpace = /\s$/.test(value);
+    const tokens = value.trim().split(/\s+/);
+    const last = hasTrailingSpace ? "" : (tokens[tokens.length - 1] || "");
+    const firstOnly = tokens.length === 1 && !hasTrailingSpace;
+    if (firstOnly && !last.includes("/")) {
+      const p = last.toLowerCase();
+      return Object.keys(COMMANDS).filter(c => c.startsWith(p)).sort();
     }
-    if (matches.length > 1) {
-      Terminal.print(matches.join("   "));
-    }
-    return null;
+    return fsCompletion(last);
   }
 
 //dispatcher
@@ -543,42 +582,26 @@ const Shell = (() => {
     const args = splitArgs(trimmed);
     const cmd = args.shift();
 
-    switch (cmd) {
-      case "help": return cmd_help();
-      case "clear": return Terminal.clear();
-      case "pwd": return cmd_pwd();
-      case "cd": return cmd_cd(args);
-      case "ls": return cmd_ls(args);
-      case "tree": return cmd_tree(args);
-      case "cat": return cmd_cat(args);
-      case "touch": return cmd_touch(args);
-      case "mkdir": return cmd_mkdir(args);
-      case "rm": return cmd_rm(args);
-      case "echo": return cmd_echo(args);
-      case "history": return cmd_history();
-      case "date": return cmd_date();
-      case "whoami": return cmd_whoami();
-      case "hostname": return cmd_hostname();
-      case "uname": return cmd_uname(args);
-      case "neofetch": return await cmd_neofetch();
-      case "start": return await cmd_start();
-      case "curl": return cmd_curl(args);
-      case "nano": return await cmd_nano(args);
-      case "sudo": return cmd_sudo(args);
-      case "reboot": return await cmd_reboot();
-      case "exit": return await cmd_exit();
-      case "color": return cmd_color(args);
-      case "setfont": return cmd_setfont(args);
-      case "volume": return cmd_volume(args);
-      case "ascii": return cmd_ascii(args);
-      case "ytvideo": return await cmd_ytvideo(args);
-      case "weather": return cmd_weather(args);
-      case "ping": return cmd_ping(args);
-      case "matrix": return await cmd_matrix();
-      case "tictactoe": return await cmd_tictactoe();
-      default:
-        Terminal.print(`${cmd}: command not found`);
+    const fn = COMMANDS[cmd];
+    if (!fn) {
+      Terminal.print(`${cmd}: command not found`);
+      return;
     }
+    return await fn(args);
+  }
+
+  // Tab key completion (single match fills the token; many are printed)
+  function tabComplete(typed) {
+    const completions = getCompletions(typed);
+    if (completions.length === 1) {
+      const parts = String(typed).split(" ");
+      parts[parts.length - 1] = completions[0];
+      return parts.join(" ");
+    }
+    if (completions.length > 1) {
+      Terminal.print(completions.join("   "));
+    }
+    return null;
   }
 
   function prompt() {
@@ -592,5 +615,5 @@ const Shell = (() => {
     return `${currentUsername}@${currentHostname}:${path}$ `;
   }
 
-  return { execute, prompt, tabComplete, printNeofetch, ASCII_LOGO, cmdHistory, helpText: HELP_TEXT };
+  return { execute, prompt, tabComplete, getCompletions, printNeofetch, ASCII_LOGO, cmdHistory, helpText: HELP_TEXT };
 })();

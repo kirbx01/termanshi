@@ -136,12 +136,17 @@ const CRT = (() => {
   let glitchActiveUntil = 0;
   let glitchSeed = 0;
 
+  const terminalPane = () => document.getElementById("terminal-pane");
+
   function resize() {
+    const pane = terminalPane();
+    const w = (pane && pane.clientWidth) || window.innerWidth;
+    const h = (pane && pane.clientHeight) || window.innerHeight;
     const dpr = Math.min(window.devicePixelRatio || 1, IS_FIREFOX ? 1.25 : 2);
-    canvas.width = Math.floor(window.innerWidth * dpr);
-    canvas.height = Math.floor(window.innerHeight * dpr);
-    canvas.style.width = window.innerWidth + "px";
-    canvas.style.height = window.innerHeight + "px";
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
     gl.viewport(0, 0, canvas.width, canvas.height);
   }
 
@@ -149,6 +154,10 @@ const CRT = (() => {
     sourceCanvas = textCanvas;
     resize();
     window.addEventListener("resize", resize);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", resize);
+      window.visualViewport.addEventListener("scroll", resize);
+    }
     requestAnimationFrame(loop);
   }
 

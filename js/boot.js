@@ -1,7 +1,5 @@
 const GRUB_LINES = [
   "GNU GRUB 2.06",
-  "Minimal BASH-like line editing is supported. For the first word, TAB lists possible command completions.",
-  "For full documentation see \"info -f grub\" and \"info grub\".",
   "Loading Linux 6.2.0-portfolio ...",
   "Loading initial ramdisk ...",
   "Booting default entry from /boot/grub/grub.cfg...",
@@ -58,6 +56,105 @@ function updatePowerButton() {
   powerButton.title = powerOn ? "Power off" : "Power on";
 }
 
+function loginSkipped() {
+  try {
+    return sessionStorage.getItem("panshi-login") === "1";
+  } catch (e) {
+    return false;
+  }
+}
+
+function markLoginDone() {
+  try {
+    sessionStorage.setItem("panshi-login", "1");
+  } catch (e) {
+  }
+}
+
+function isTerminalActive() {
+  const login = document.getElementById("login-screen");
+  return !login || login.classList.contains("done");
+}
+
+let loginReadyResolve = null;
+const loginReadyPromise = new Promise((resolve) => {
+  loginReadyResolve = resolve;
+});
+
+function hideLoginScreen() {
+  const login = document.getElementById("login-screen");
+  const user = document.getElementById("login-user");
+  const pwd = document.getElementById("login-pwd");
+  if (!login || login.classList.contains("done")) return;
+  login.classList.add("done");
+  if (user) user.blur();
+  if (pwd) pwd.blur();
+}
+
+function handleLoginSubmit(event) {
+  if (event) event.preventDefault();
+  const login = document.getElementById("login-screen");
+  const user = document.getElementById("login-user");
+  const pwd = document.getElementById("login-pwd");
+  if (!user || !pwd) return;
+
+  const userValue = user.value.trim();
+  const pwdValue = pwd.value.trim();
+
+  if (!userValue || !pwdValue) {
+    if (login) login.classList.add("invalid");
+    (userValue ? pwd : user).focus({ preventScroll: true });
+    return;
+  }
+  if (login && login.classList.contains("done")) return;
+
+  markLoginDone();
+  login.classList.add("done");
+  if (user) user.blur();
+  if (pwd) pwd.blur();
+  window.setTimeout(() => {
+    if (loginReadyResolve) {
+      loginReadyResolve();
+      loginReadyResolve = null;
+    }
+  }, 350);
+}
+
+function initLogin() {
+  const card = document.getElementById("login-card");
+  const submit = document.getElementById("login-submit");
+  const user = document.getElementById("login-user");
+  const pwd = document.getElementById("login-pwd");
+  const login = document.getElementById("login-screen");
+
+  if (card) card.addEventListener("submit", handleLoginSubmit);
+  if (submit) submit.addEventListener("click", handleLoginSubmit);
+  if (pwd) pwd.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleLoginSubmit();
+    }
+  });
+  if (login && loginSkipped()) login.classList.add("done");
+
+  const coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+  if (!coarse && user && !loginSkipped()) {
+    user.focus({ preventScroll: true });
+  }
+}
+
+function initMenuBar() {
+  const bar = document.getElementById("menu-bar");
+  if (!bar) return;
+  bar.querySelectorAll(".menu-item").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!isTerminalActive()) return;
+      if (button.dataset.menu === "help") Shell.execute("help");
+      Terminal.focusInput();
+    });
+  });
+}
+
 async function runGrubSequence() {
   Terminal.clear();
   const targetRows = Terminal.rows || 24;
@@ -84,23 +181,9 @@ async function runBootSequence() {
 
 async function runLogin() {
   Terminal.clear();
-  Terminal.print("Logging in...");
-  await Terminal.sleep(700);
-  Terminal.print("Access granted.");
-  await Terminal.sleep(350);
   const config = window.PORTFOLIO_CONFIG || {};
   Terminal.print(config.welcomeMessage || "Welcome back, viewer.");
-  await Terminal.sleep(600);
-  Terminal.print("");
-  Terminal.print("Connected to network.");
-  Terminal.print("");
-  if (Shell.helpText) {
-    Terminal.print("Available commands:");
-    Terminal.print(Shell.helpText);
-    Terminal.print("");
-  }
-  Terminal.print("Type 'start' to initialize.");
-  Terminal.print("");
+  await Terminal.sleep(450);
 }
 
 async function runShellLoop() {
@@ -109,6 +192,7 @@ async function runShellLoop() {
       prefix: Shell.prompt(),
       history: Shell.cmdHistory,
       onTab: Shell.tabComplete,
+      onSuggest: Shell.getCompletions,
     });
     const result = await Shell.execute(raw);
     if (result === "LOGOUT") return;
@@ -139,9 +223,15 @@ function waitForPowerOn() {
   });
 }
 
+async function waitForLogin() {
+  if (loginSkipped()) return;
+  await loginReadyPromise;
+}
+
 async function main() {
   await Terminal.init();
-  await waitForPowerOn();
+  await waitForLogin();
+  hideLoginScreen();
   await runGrubSequence();
   await runBootSequence();
   while (true) {
@@ -150,4 +240,8 @@ async function main() {
   }
 }
 
-window.addEventListener("DOMContentLoaded", main);
+window.addEventListener("DOMContentLoaded", () => {
+  initLogin();
+  initMenuBar();
+  main();
+});

@@ -88,6 +88,9 @@ const Terminal = (() => {
   let currentHistory = null;
   let historyIndex = 0;
   let tabHandler = null;
+  let suggestionsProvider = null;
+  let suggestions = null;     // { items:[], spans:[{x0,x1,y0,y1}], extra:"" } drawn above the live line
+  const terminalPane = document.getElementById("terminal-pane");
 
   let cursorVisible = true;
   let blinkTimer = null;
@@ -146,8 +149,8 @@ const Terminal = (() => {
 
   function resize() {
     dpr = Math.min(window.devicePixelRatio || 1, IS_FIREFOX ? 1.25 : 2);
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    const w = (terminalPane && terminalPane.clientWidth) || window.innerWidth;
+    const h = (terminalPane && terminalPane.clientHeight) || window.innerHeight;
     const padding = Math.max(12, Math.round(Math.min(w, h) * 0.03));
     padLeft = Math.min(32, padding);
     padTop = Math.min(28, Math.round(padding * 1.1));
@@ -252,6 +255,120 @@ const Terminal = (() => {
     ctx.fillRect(x, y, Math.max(2, Math.round(charWidth * 0.7)), cursorHeight);
   }
 
+  function userInputActive() {
+    const login = document.getElementById("login-screen");
+    return !login || login.classList.contains("done");
+  }
+
+  // Inverse of the CRT barrel warp (effects.js): where a source-pane point
+  // lands on the visible screen, so taps/renders stay aligned under the glow.
+  function warpPoint(x, y) {
+    const w = (terminalPane && terminalPane.clientWidth) || window.innerWidth;
+    const h = (terminalPane && terminalPane.clientHeight) || window.innerHeight;
+    let cx = (x / Math.max(w, 1)) * 2 - 1;
+    let cy = (y / Math.max(h, 1)) * 2 - 1;
+    const aspect = w / Math.max(h, 1);
+    const portrait = aspect <= 1 ? 1 : 0;
+    const verticalBias = portrait ? 0.12 : 0.07;
+    const horizontalBias = portrait ? 0.03 : 0.06;
+    const r2 = cx * cx + cy * cy;
+    const curve = 1 + verticalBias * r2 + horizontalBias * (cx * cx - cy * cy) * 0.4;
+    cx /= curve;
+    cy /= curve;
+    return { x: (cx * 0.5 + 0.5) * w, y: (cy * 0.5 + 0.5) * h };
+  }
+
+  function buildSuggestions(typed) {
+    const list = suggestionsProvider ? suggestionsProvider(typed) : [];
+    if (!list || !list.length) return null;
+    const avail = Math.max(12, cols - 1);
+    const items = [];
+    const parts = [];
+    let width = 0;
+    let truncated = false;
+    for (const item of list) {
+      const gap = parts.length ? 3 : 0;
+      if (width + gap + item.length > avail) {
+        truncated = true;
+        break;
+      }
+      parts.push(item);
+      items.push(item);
+      width += gap + item.length;
+    }
+    if (!items.length) return null;
+    return { items, extra: truncated ? "…" : null };
+  }
+
+  function drawSuggestionsRow(suggestion, rowIndex) {
+    const c = baseColor();
+    ctx.shadowColor = c;
+    ctx.shadowBlur = GLOW_BLUR;
+    ctx.fillStyle = c;
+    const baseY = Math.round(padTop + rowIndex * lineHeight + fontMetrics.ascent + 2);
+    const rowY0 = padTop + rowIndex * lineHeight;
+    const rowY1 = padTop + (rowIndex + 1) * lineHeight;
+    const gap = ctx.measureText(" ").width * 3;
+    const spans = [];
+    let x = padLeft;
+    for (let i = 0; i < suggestion.items.length; i++) {
+      const seg = suggestion.items[i];
+      const w = ctx.measureText(seg).width;
+      ctx.fillText(seg, Math.round(x), baseY);
+      ctx.strokeStyle = c;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(Math.round(x), Math.round(baseY + 2));
+      ctx.lineTo(Math.round(x + w), Math.round(baseY + 2));
+      ctx.stroke();
+      const p0 = warpPoint(x, rowY0);
+      const p1 = warpPoint(x + w, rowY0);
+      const p2 = warpPoint(x, rowY1);
+      const p3 = warpPoint(x + w, rowY1);
+      spans.push({
+        dsp: {
+          x0: Math.min(p0.x, p1.x, p2.x, p3.x),
+          x1: Math.max(p0.x, p1.x, p2.x, p3.x),
+          y0: Math.min(p0.y, p1.y, p2.y, p3.y),
+          y1: Math.max(p0.y, p1.y, p2.y, p3.y),
+        },
+        text: seg,
+      });
+      x += w + gap;
+    }
+    if (suggestion.extra) {
+      ctx.globalAlpha = 0.8;
+      ctx.fillText(suggestion.extra, Math.round(x), baseY);
+      ctx.globalAlpha = 1;
+    }
+    suggestion.spans = spans;
+  }
+
+  function tryRunSuggestion(event) {
+    if (!suggestions || !liveLine || !suggestions.spans || mode !== "shell") return false;
+    if (!terminalPane) return false;
+    const rect = terminalPane.getBoundingClientRect();
+    const dx = event.clientX - rect.left;
+    const dy = event.clientY - rect.top;
+    for (const span of suggestions.spans) {
+      if (!span.dsp) continue;
+      const rx0 = span.dsp.x0 - 5;
+      const rx1 = span.dsp.x1 + 5;
+      const ry0 = span.dsp.y0 - 4;
+      const ry1 = span.dsp.y1 + 4;
+      if (dx >= rx0 && dx <= rx1 && dy >= ry0 && dy <= ry1) {
+        const parts = liveLine.typed.split(" ");
+        parts[parts.length - 1] = span.text;
+        liveLine.typed = parts.join(" ");
+        liveLine.cursor = liveLine.typed.length;
+        suggestions = null;
+        finalizeLine();
+        return true;
+      }
+    }
+    return false;
+  }
+
   function render() {
     ctx.save();
     ctx.shadowBlur = 0;
@@ -271,6 +388,17 @@ const Terminal = (() => {
     }
 
     const displayLines = lines.slice();
+    let sugIndex = -1;
+    if (liveLine && mode === "shell" && suggestionsProvider) {
+      const built = buildSuggestions(liveLine.typed);
+      if (built && built.items.length) {
+        sugIndex = displayLines.length;
+        displayLines.push("");
+        suggestions = built;
+      } else {
+        suggestions = null;
+      }
+    }
     if (liveLine) {
       const shown = liveLine.mask
         ? liveLine.prefix + liveLine.mask.repeat(liveLine.typed.length)
@@ -280,8 +408,14 @@ const Terminal = (() => {
 
     const visible = displayLines.slice(-rows);
     const startRow = 0;
+    let sugRowIndex = -1;
+    if (sugIndex !== -1) sugRowIndex = sugIndex - (displayLines.length - visible.length);
     for (let i = 0; i < visible.length; i++) {
-      drawTextRow(visible[i], startRow + i);
+      if (suggestions && i === sugRowIndex) {
+        drawSuggestionsRow(suggestions, i);
+      } else {
+        drawTextRow(visible[i], startRow + i);
+      }
     }
 
     if (liveLine) {
@@ -382,12 +516,14 @@ const Terminal = (() => {
     }
   }
 
-  function readLine({ prefix = "", mask = null, history = null, onTab = null } = {}) {
+  function readLine({ prefix = "", mask = null, history = null, onTab = null, onSuggest = null } = {}) {
     return new Promise((resolve, reject) => {
       liveLine = { prefix, typed: "", cursor: 0, mask };
       currentHistory = history;
       historyIndex = history ? history.length : 0;
       tabHandler = onTab;
+      suggestionsProvider = onSuggest;
+      suggestions = null;
       inputResolver = resolve;
       inputReject = reject;
       render();
@@ -406,6 +542,8 @@ const Terminal = (() => {
     liveLine = null;
     const typed = l.typed;
     tabHandler = null;
+    suggestionsProvider = null;
+    suggestions = null;
     currentHistory = null;
     const resolve = inputResolver;
     inputResolver = null;
@@ -785,6 +923,10 @@ const Terminal = (() => {
   }
 
   function handleTouchEnd(event) {
+    if (!userInputActive()) {
+      touchActive = false;
+      return;
+    }
     if (!touchActive) return;
     const touch = event.changedTouches ? event.changedTouches[0] : null;
     if (!touch) return;
@@ -889,8 +1031,17 @@ const Terminal = (() => {
   });
 
   window.addEventListener("resize", resize);
-  window.addEventListener("pointerdown", focusHiddenInput, { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", resize);
+    window.visualViewport.addEventListener("scroll", resize);
+  }
+  window.addEventListener("pointerdown", (event) => {
+    if (!userInputActive()) return;
+    if (tryRunSuggestion(event)) return;
+    focusHiddenInput();
+  }, { passive: true });
   document.addEventListener("pointerdown", (event) => {
+    if (!userInputActive()) return;
     if (event.target instanceof HTMLElement && event.target.closest("button, input")) return;
     focusHiddenInput();
   });
@@ -922,11 +1073,15 @@ const Terminal = (() => {
   return {
     init, print, printRich, printColumns, clear, sleep,
     typeLine, typeLines, readLine, nanoEdit,
+    focusInput: focusHiddenInput,
     setTheme, getTheme, THEME_NAMES, DOT_HUES,
     setFontSize, adjustFontSize, setFontFamily, resetFont, getFontInfo,
     FONT_FAMILIES,
     runMatrix, runTicTacToe,
     get cols() { return cols; },
     get rows() { return rows; },
+    getSuggestionSpans: () => (suggestions && suggestions.spans
+      ? suggestions.spans.map((s) => ({ text: s.text, dsp: s.dsp ? { ...s.dsp } : null }))
+      : []),
   };
 })();
