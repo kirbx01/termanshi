@@ -192,18 +192,19 @@ canvas {
   z-index: 40;
   display: block;
   background: #ffaa00;
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.45s ease, visibility 0.45s ease;
-}
-
-#login-screen.done {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
 }
 
-#login-screen.boot {
+#login-screen.login-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#login-screen.done {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;

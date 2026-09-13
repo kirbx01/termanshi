@@ -219,12 +219,11 @@ async function waitForLogin() {
 async function main() {
   const loginEl = document.getElementById("login-screen");
   const menuBar = document.getElementById("menu-bar");
-  if (loginEl) loginEl.classList.add("boot");
   if (menuBar) menuBar.classList.add("hidden");
   await Terminal.init();
   await runGrubSequence();
   await runBootSequence();
-  if (loginEl) loginEl.classList.remove("boot");
+  if (loginEl) loginEl.classList.add("login-visible");
   const coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
   if (!coarse) {
     const user = document.getElementById("login-user");
