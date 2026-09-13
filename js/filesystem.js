@@ -81,21 +81,21 @@ curl Port0000  ->  opens the GitHub repository`,
 //url (second arg of file()) and the Blogs menu will pick them up +
 //clicking one in the terminal opens the url in a new tab.
       blogs: dir({
-        "blog-1-hello-soldering.txt": file(
+        "blog-1-hasi-mazak": file(
 `Blog #1 - Hello soldering world
 URL: https://your-blog.example/1
 
 PLACEHOLDER - replace this text and the url in js/filesystem.js`,
           "https://your-blog.example/1"),
 
-        "blog-2-ricing-setup.txt": file(
+        "blog-2-hasi-mazak2-since-ihavencluewhattoput": file(
 `Blog #2 - How I riced my setup
 URL: https://your-blog.example/2
 
 PLACEHOLDER - replace this text and the url in js/filesystem.js`,
           "https://your-blog.example/2"),
 
-        "blog-3-kei-and-engineering.txt": file(
+        "blog-3-idontwriteblogssoewu-infutureill": file(
 `Blog #3 - Kei, Osaka and engineering
 URL: https://your-blog.example/3
 
