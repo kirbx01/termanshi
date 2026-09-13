@@ -535,7 +535,13 @@ const Shell = (() => {
 
     for (const line of ascii) Terminal.print(line);
     Terminal.print("");
-    for (const line of info) Terminal.print(line);
+    for (const line of info) {
+      if (Array.isArray(line)) {
+        Terminal.printRich(line);
+      } else {
+        Terminal.print(line);
+      }
+    }
   }
 
 //resume.pdf

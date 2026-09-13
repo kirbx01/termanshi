@@ -56,21 +56,6 @@ function updatePowerButton() {
   powerButton.title = powerOn ? "Power off" : "Power on";
 }
 
-function loginSkipped() {
-  try {
-    return sessionStorage.getItem("panshi-login") === "1";
-  } catch (e) {
-    return false;
-  }
-}
-
-function markLoginDone() {
-  try {
-    sessionStorage.setItem("panshi-login", "1");
-  } catch (e) {
-  }
-}
-
 function isTerminalActive() {
   const login = document.getElementById("login-screen");
   return !login || login.classList.contains("done");
@@ -108,7 +93,6 @@ function handleLoginSubmit(event) {
   }
   if (login && login.classList.contains("done")) return;
 
-  markLoginDone();
   login.classList.add("done");
   if (user) user.blur();
   if (pwd) pwd.blur();
@@ -123,9 +107,7 @@ function handleLoginSubmit(event) {
 function initLogin() {
   const card = document.getElementById("login-card");
   const submit = document.getElementById("login-submit");
-  const user = document.getElementById("login-user");
   const pwd = document.getElementById("login-pwd");
-  const login = document.getElementById("login-screen");
 
   if (card) card.addEventListener("submit", handleLoginSubmit);
   if (submit) submit.addEventListener("click", handleLoginSubmit);
@@ -135,12 +117,6 @@ function initLogin() {
       handleLoginSubmit();
     }
   });
-  if (login && loginSkipped()) login.classList.add("done");
-
-  const coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
-  if (!coarse && user && !loginSkipped()) {
-    user.focus({ preventScroll: true });
-  }
 }
 
 const MENU_COMMANDS = {
@@ -237,16 +213,23 @@ function waitForPowerOn() {
 }
 
 async function waitForLogin() {
-  if (loginSkipped()) return;
   await loginReadyPromise;
 }
 
 async function main() {
   await Terminal.init();
-  await waitForLogin();
-  hideLoginScreen();
+  const loginEl = document.getElementById("login-screen");
+  if (loginEl) loginEl.classList.add("boot");
   await runGrubSequence();
   await runBootSequence();
+  if (loginEl) loginEl.classList.remove("boot");
+  const coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+  if (!coarse) {
+    const user = document.getElementById("login-user");
+    if (user) user.focus({ preventScroll: true });
+  }
+  await waitForLogin();
+  hideLoginScreen();
   while (true) {
     await runLogin();
     await runShellLoop();

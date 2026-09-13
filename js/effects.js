@@ -65,16 +65,16 @@ const CRT = (() => {
       float b = texture2D(uTex, uv + dir * aberration).b;
       vec3 color = vec3(r, g, b);
 
-      float scan = 0.94 + 0.06 * sin(uv.y * uResolution.y * 3.14159 * 1.0);
+      float scan = 0.98 + 0.02 * sin(uv.y * uResolution.y * 3.14159 * 1.0);
       color *= scan;
 
       float col = mod(gl_FragCoord.x, 3.0);
       float mask = 0.92;
       if (col < 1.0) mask = 1.0;
-      color *= mix(0.90, 1.0, mask);
+      color *= mix(0.96, 1.0, mask);
 
       float vig = smoothstep(1.15, 0.35, length(cc));
-      color *= mix(0.55, 1.0, vig);
+      color *= mix(0.75, 1.0, vig);
 
       float n = (rand(uv * uResolution.xy + uTime * 60.0) - 0.5) * 0.035;
       color += n;

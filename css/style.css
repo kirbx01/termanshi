@@ -1,6 +1,6 @@
 :root {
   --term-bg: #080808;
-  --term-amber: #ffdd00;
+  --term-amber: #d0b400;
   --term-amber-dim: rgba(255, 221, 0, 0.42);
   --term-fg: #f2f2f2;
   --term-mono: "Xanh Mono", monospace;
@@ -159,24 +159,6 @@ html, body {
   display: block;
 }
 
-#mobile-swipe-hint {
-  position: absolute;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.65);
-  color: #ffffff;
-  font-size: 0.82rem;
-  line-height: 1.3;
-  padding: 8px 14px;
-  border-radius: 999px;
-  letter-spacing: 0.02em;
-  opacity: 0.88;
-  pointer-events: none;
-  z-index: 15;
-  display: none;
-}
-
 canvas {
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
@@ -217,6 +199,12 @@ canvas {
   pointer-events: none;
 }
 
+#login-screen.boot {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .login-scroll {
   height: 100%;
   height: 100dvh;
@@ -242,13 +230,13 @@ canvas {
 }
 
 #login-banner {
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   overflow: hidden;
-  font-family: var(--term-header);
-  font-weight: 400;
-  line-height: 1.12;
+  font-family: var(--term-mono);
+  font-weight: 700;
+  line-height: 1.2;
   white-space: pre;
-  font-size: clamp(5px, 1.45vw, 9px);
+  font-size: clamp(9px, 2.4vw, 16px);
   background: linear-gradient(180deg, var(--term-amber) 0%, #ff9a3d 62%, #ffe9a3 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -257,7 +245,7 @@ canvas {
 
 @supports (container-type: inline-size) {
   #login-banner {
-    font-size: calc(1.55cqi);
+    font-size: calc(4cqi);
   }
 }
 
@@ -340,10 +328,4 @@ canvas {
   0%, 100% { transform: none; }
   25% { transform: translateX(-5px); }
   75% { transform: translateX(5px); }
-}
-
-@media (max-width: 900px) {
-  #mobile-swipe-hint {
-    display: block;
-  }
 }

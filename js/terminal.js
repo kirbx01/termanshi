@@ -5,7 +5,7 @@ const Terminal = (() => {
 
   const BG = "#000000";
   const IS_FIREFOX = /Firefox\//.test(navigator.userAgent || "");
-  const GLOW_BLUR = IS_FIREFOX ? 16 : 28;        
+  const GLOW_BLUR = IS_FIREFOX ? 20 : 36;        
 
   const THEMES = {
     rgb:    { mode: "rgb" },
@@ -57,13 +57,13 @@ const Terminal = (() => {
   const FONT_FAMILIES = {
     xanh: '"Xanh Mono"',
   };
-  const FONT_WEIGHT = 400;
-  const DEFAULT_FONT_SIZE = 17;
-  const MIN_FONT_SIZE = 12;
-  const MAX_FONT_SIZE = 26;
+  const FONT_WEIGHT = 700;
+  const DEFAULT_FONT_SIZE = 22;
+  const MIN_FONT_SIZE = 14;
+  const MAX_FONT_SIZE = 34;
   let currentFontKey = "xanh";
   let fontSize = DEFAULT_FONT_SIZE;
-  let lineHeight = 25;
+  let lineHeight = 32;
   let padLeft = 24;
   let padTop = 24;
   let charWidth = 0;
@@ -136,9 +136,7 @@ const Terminal = (() => {
 
   function resetFont() {
     currentFontKey = "xanh";
-    fontSize = DEFAULT_FONT_SIZE;
-    lineHeight = 25;
-    resize();
+    setFontSize(DEFAULT_FONT_SIZE);
   }
 
   function getFontInfo() {
@@ -956,58 +954,11 @@ const Terminal = (() => {
 
   const hiddenInput = document.getElementById("hidden-input");
   const screenElement = document.getElementById("screen");
-  const swipeHint = document.getElementById("mobile-swipe-hint");
-  let touchStartY = 0;
-  let touchStartX = 0;
-  let touchActive = false;
-  const SWIPE_THRESHOLD = 60;
-  const MAX_SWIPE_X = 60;
 
   function focusHiddenInput() {
     if (hiddenInput) {
       hiddenInput.focus({ preventScroll: true });
     }
-  }
-
-  function showSwipeHint() {
-    if (!swipeHint) return;
-    swipeHint.classList.add("visible");
-    window.clearTimeout(swipeHint._hintTimeout);
-    swipeHint._hintTimeout = window.setTimeout(() => {
-      swipeHint.classList.remove("visible");
-    }, 2400);
-  }
-
-  function handleTouchStart(event) {
-    if (!event.touches || event.touches.length !== 1) return;
-    const touch = event.touches[0];
-    touchStartX = touch.clientX;
-    touchStartY = touch.clientY;
-    touchActive = true;
-  }
-
-  function handleTouchMove(event) {
-    if (!touchActive || !event.touches || event.touches.length !== 1) return;
-    const touch = event.touches[0];
-    if (Math.abs(touch.clientX - touchStartX) > MAX_SWIPE_X) {
-      touchActive = false;
-    }
-  }
-
-  function handleTouchEnd(event) {
-    if (!userInputActive()) {
-      touchActive = false;
-      return;
-    }
-    if (!touchActive) return;
-    const touch = event.changedTouches ? event.changedTouches[0] : null;
-    if (!touch) return;
-    const deltaY = touchStartY - touch.clientY;
-    if (deltaY >= SWIPE_THRESHOLD) {
-      focusHiddenInput();
-      showSwipeHint();
-    }
-    touchActive = false;
   }
 
   hiddenInput?.addEventListener("input", () => {
@@ -1126,9 +1077,6 @@ const Terminal = (() => {
     if (tryRunSuggestion(event)) return;
     focusHiddenInput();
   }, { passive: true });
-  window.addEventListener("touchstart", handleTouchStart, { passive: true });
-  window.addEventListener("touchmove", handleTouchMove, { passive: true });
-  window.addEventListener("touchend", handleTouchEnd, { passive: true });
 
   async function loadFonts() {
     if (!document.fonts) return; 
