@@ -66,7 +66,7 @@ curl Port0000  ->  opens the GitHub repository`,
 //graphics
       graphics: dir({
         Artstation : file("Digital art & 3D work.\ncurl Artstation -> opens profile", "https://www.artstation.com/pansgotnocakes/"),
-        Behance: file("Graphic design & visual work.\ncurl Behance -> opens profile", "https://www.behance.net/priyanshi--")
+        Instagram: file("Graphic design & visual work.\ncurl Instagram -> opens profile", "https://www.instagram.com/vyox3l")
       }),
 //media (music,video streaming)
       media: dir({
