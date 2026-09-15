@@ -47,11 +47,9 @@ Feel free to reach out >///< `),
 curl Termanshi  ->  opens the GitHub repository`,
           "https://github.com/kirbx01/termanshi"),
 
-        Discoring: file(
-`Discoring
-A Discord music bot written in Rust with native audio playback, avoiding FFmpeg entirely. Built as a learning project focused on performance, simplicity, and low dependencies. Still a work in progress.
-curl Discoring  ->  opens the GitHub repository`,
-          "https://github.com/kirbyandluigixxcf/discoring"),
+        mx3ro: file(
+`A BFS traversal implementation in go also focusing on the capped dfs since it has to render a minimum of 5 routes. This uses lipgloss for rendering and beautifying the terminal and termenv so to have consistent colours across xterm standards`,
+          "https://github.com/kirbx01/mx3ro/"),
 
         Port0000: file(
 `Port0000
